@@ -113,27 +113,39 @@ function toDateStr(rawDate: any): string {
   return "";
 }
 
-// ─── Correspondance souple des noms de colonnes ───────────────────────────────
+// ─── Normaliser une chaîne (supprimer accents, ponctuation, minuscules) ────────
 
-const COL_ALIASES: Record<string, string[]> = {
-  numero:        ["n°", "no", "num", "numéro", "numero", "#"],
-  nom:           ["nom", "nom et prénom", "nom et prenom", "prénom", "prenom", "name", "full name", "nom complet"],
-  dateNaissance: ["date de naissance", "date naissance", "naissance", "dob", "date_naissance"],
-  sexe:          ["sexe", "genre", "sex", "gender"],
-  pieceIdentite: ["n° pièce", "n° piece", "piece identite", "pièce d'identité", "identite", "cin", "passeport", "id"],
-  lien:          ["lien", "lien avec", "lien avec l'adhérent", "parenté", "parente", "relation"],
-  dateAdhesion:  ["date d'adhésion", "date adhesion", "adhesion", "date_adhesion"],
+function norm(s: any): string {
+  return String(s ?? "")
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")   // supprimer accents
+    .replace(/[^a-z0-9]+/g, " ")                         // garder seulement alphanumérique
+    .trim();
+}
+
+// ─── Correspondance souple des noms de colonnes ───────────────────────────────
+// Chaque alias est normalisé (sans accents ni ponctuation)
+
+const COL_PATTERNS: Record<string, string[]> = {
+  numero:        ["n", "no", "num", "numero"],
+  nom:           ["nom", "prenom", "name", "complet"],
+  dateNaissance: ["naissance", "dob"],
+  sexe:          ["sexe", "genre", "sex"],
+  pieceIdentite: ["piece", "identite", "cin", "passeport"],
+  lien:          ["lien", "parent", "adherent", "relation"],
+  dateAdhesion:  ["adhesion"],
   salaire:       ["salaire", "salary", "revenu"],
   garantie:      ["garantie", "plan", "formule"],
 };
 
-function findColIndex(headers: string[], field: string): number {
-  const aliases = COL_ALIASES[field] ?? [field];
-  for (let i = 0; i < headers.length; i++) {
-    const h = String(headers[i] ?? "").toLowerCase().trim();
-    if (aliases.some(a => h.includes(a) || a.includes(h))) return i;
+function findKey(keys: string[], field: string): string | null {
+  const patterns = COL_PATTERNS[field] ?? [field];
+  // Premier passage : correspondance exacte ou inclusion forte
+  for (const key of keys) {
+    const n = norm(key);
+    if (patterns.some(p => n.includes(p))) return key;
   }
-  return -1;
+  return null;
 }
 
 // ─── Parser le fichier Excel ──────────────────────────────────────────────────
@@ -144,10 +156,9 @@ function parseExcel(file: File): Promise<MembrePopulation[]> {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target!.result as ArrayBuffer);
-        // Ne PAS utiliser cellDates:true — on gère les dates manuellement
         const wb = XLSX.read(data, { type: "array" });
 
-        // Lire la première feuille non vide
+        // Première feuille non vide
         let ws: XLSX.WorkSheet | null = null;
         for (const name of wb.SheetNames) {
           const candidate = wb.Sheets[name];
@@ -155,75 +166,68 @@ function parseExcel(file: File): Promise<MembrePopulation[]> {
         }
         if (!ws) { reject(new Error("Fichier Excel vide ou illisible")); return; }
 
-        // Lire toutes les lignes sous forme de tableaux bruts
-        const rows = XLSX.utils.sheet_to_json(ws, {
-          header: 1,
+        // sheet_to_json SANS header:1 → chaque ligne est un objet {colonneName: valeur}
+        // La première ligne du fichier devient les clés de l'objet
+        const jsonRows = XLSX.utils.sheet_to_json(ws, {
           defval: "",
           blankrows: false,
-        }) as any[][];
+          raw: true,           // garder les valeurs brutes (dates comme numéros série)
+        }) as Record<string, any>[];
 
-        // Trouver la ligne d'en-tête : première ligne avec au moins 2 cellules texte non vides
-        let headerRowIdx = -1;
-        for (let i = 0; i < Math.min(10, rows.length); i++) {
-          const textCells = (rows[i] ?? []).filter(
-            (c: any) => typeof c === "string" && c.trim().length > 0
-          );
-          if (textCells.length >= 2) { headerRowIdx = i; break; }
+        if (jsonRows.length === 0) {
+          reject(new Error("Aucune donnée trouvée dans le fichier (le fichier est vide ou ne contient qu'un en-tête)."));
+          return;
         }
 
-        // Mapper les colonnes
-        const idx = { numero: 0, nom: 1, dateNaissance: 2, sexe: 3, pieceIdentite: 4, lien: 5, dateAdhesion: 6, salaire: 7, garantie: 8 };
+        // Récupérer toutes les clés (= noms des colonnes)
+        const allKeys = Object.keys(jsonRows[0]);
 
-        if (headerRowIdx >= 0) {
-          const headers = (rows[headerRowIdx] ?? []).map((h: any) => String(h ?? "").toLowerCase().trim());
-          idx.numero        = findColIndex(headers, "numero")        >= 0 ? findColIndex(headers, "numero")        : 0;
-          idx.nom           = findColIndex(headers, "nom")           >= 0 ? findColIndex(headers, "nom")           : 1;
-          idx.dateNaissance = findColIndex(headers, "dateNaissance") >= 0 ? findColIndex(headers, "dateNaissance") : 2;
-          idx.sexe          = findColIndex(headers, "sexe")          >= 0 ? findColIndex(headers, "sexe")          : 3;
-          idx.pieceIdentite = findColIndex(headers, "pieceIdentite") >= 0 ? findColIndex(headers, "pieceIdentite") : 4;
-          idx.lien          = findColIndex(headers, "lien")          >= 0 ? findColIndex(headers, "lien")          : 5;
-          idx.dateAdhesion  = findColIndex(headers, "dateAdhesion")  >= 0 ? findColIndex(headers, "dateAdhesion")  : 6;
-          idx.salaire       = findColIndex(headers, "salaire")       >= 0 ? findColIndex(headers, "salaire")       : 7;
-          idx.garantie      = findColIndex(headers, "garantie")      >= 0 ? findColIndex(headers, "garantie")      : 8;
-        }
+        // Trouver la clé correspondant à chaque champ
+        const k = {
+          nom:           findKey(allKeys, "nom"),
+          dateNaissance: findKey(allKeys, "dateNaissance"),
+          sexe:          findKey(allKeys, "sexe"),
+          pieceIdentite: findKey(allKeys, "pieceIdentite"),
+          lien:          findKey(allKeys, "lien"),
+          dateAdhesion:  findKey(allKeys, "dateAdhesion"),
+          salaire:       findKey(allKeys, "salaire"),
+          garantie:      findKey(allKeys, "garantie"),
+        };
 
-        const get = (row: any[], i: number) => (i >= 0 ? row[i] : "");
+        const g = (row: Record<string, any>, key: string | null) => (key ? row[key] : "");
 
         const membres: MembrePopulation[] = [];
-        // Si aucun en-tête trouvé, démarrer dès la ligne 0
-        const dataStart = headerRowIdx >= 0 ? headerRowIdx + 1 : 0;
-
-        for (let i = dataStart; i < rows.length; i++) {
-          const row = rows[i] ?? [];
-          // Essayer de trouver un nom dans n'importe quelle colonne si idx.nom rate
-          let nom = String(get(row, idx.nom) ?? "").trim();
+        jsonRows.forEach((row) => {
+          // Nom : essayer la clé trouvée, sinon prendre la première valeur texte longue
+          let nom = String(g(row, k.nom) ?? "").trim();
           if (!nom) {
-            // Chercher la première cellule texte non vide de la ligne
-            const fallback = row.find((c: any) => typeof c === "string" && c.trim().length > 1 && isNaN(Number(c)));
-            if (fallback) nom = String(fallback).trim();
+            const fallback = allKeys.find(key => {
+              const v = String(row[key] ?? "").trim();
+              return v.length > 1 && isNaN(Number(v));
+            });
+            if (fallback) nom = String(row[fallback]).trim();
           }
-          if (!nom) continue;
+          if (!nom) return;
 
-          const dateNaissance = toDateStr(get(row, idx.dateNaissance));
+          const dateNaissance = toDateStr(g(row, k.dateNaissance));
 
           membres.push({
-            numero:        Number(get(row, idx.numero)) || (membres.length + 1),
+            numero:        membres.length + 1,
             nom,
             dateNaissance,
-            sexe:          String(get(row, idx.sexe)          ?? "").trim(),
-            pieceIdentite: String(get(row, idx.pieceIdentite) ?? "").trim(),
-            lien:          String(get(row, idx.lien)          ?? "").trim(),
-            dateAdhesion:  toDateStr(get(row, idx.dateAdhesion)) || String(get(row, idx.dateAdhesion) ?? "").trim(),
-            salaire:       get(row, idx.salaire) ? String(get(row, idx.salaire)) : undefined,
-            garantie:      String(get(row, idx.garantie) ?? "").trim() || "Standard",
+            sexe:          String(g(row, k.sexe)          ?? "").trim(),
+            pieceIdentite: String(g(row, k.pieceIdentite) ?? "").trim(),
+            lien:          String(g(row, k.lien)          ?? "").trim(),
+            dateAdhesion:  toDateStr(g(row, k.dateAdhesion)) || String(g(row, k.dateAdhesion) ?? "").trim(),
+            salaire:       g(row, k.salaire) ? String(g(row, k.salaire)) : undefined,
+            garantie:      String(g(row, k.garantie) ?? "").trim() || "Standard",
             type:          typeFromDate(dateNaissance),
           });
-        }
+        });
 
         if (membres.length === 0) {
           reject(new Error(
-            `Aucune donnée trouvée. Vérifiez que le fichier contient bien des données à partir de la ligne 2 ` +
-            `(${rows.length} ligne${rows.length > 1 ? "s" : ""} lue${rows.length > 1 ? "s" : ""} au total).`
+            `Aucun membre valide trouvé. Colonnes détectées : ${allKeys.join(", ")}`
           ));
           return;
         }
