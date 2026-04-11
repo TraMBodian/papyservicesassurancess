@@ -17,31 +17,58 @@ import {
 } from "./NewFamillePage";
 import { calcDecomptePopulation, type MembrePopulation } from "./NewGroupePage";
 
-// Adapte l'ancien format (employesDetail) vers MembrePopulation
-function toMembres(groupe: any): MembrePopulation[] {
-  if (groupe.membresDetail?.length) return groupe.membresDetail;
-  if (groupe.employesDetail?.length) {
-    const result: MembrePopulation[] = [];
-    let n = 1;
-    for (const emp of groupe.employesDetail) {
-      result.push({
-        numero: n++, nom: emp.nom, dateNaissance: emp.dateNaissance || "",
-        sexe: "", pieceIdentite: emp.matricule || "", lien: "Employé",
-        dateAdhesion: "", salaire: undefined, garantie: "Standard",
-        type: emp.type || typeFromDate(emp.dateNaissance || ""),
-      });
-      for (const m of (emp.famille || [])) {
-        result.push({
-          numero: n++, nom: m.nom, dateNaissance: m.dateNaissance || "",
-          sexe: "", pieceIdentite: "", lien: m.lien || "Famille",
-          dateAdhesion: "", salaire: undefined, garantie: "Standard",
-          type: m.type || typeFromDate(m.dateNaissance || ""),
-        });
-      }
-    }
-    return result;
+// Parse employesDetail : le backend retourne une chaîne JSON, pas un tableau
+function parseDetail(raw: any): any[] {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === "string") {
+    try { const p = JSON.parse(raw); return Array.isArray(p) ? p : []; }
+    catch { return []; }
   }
   return [];
+}
+
+// Convertit le JSON stocké en liste de MembrePopulation
+function toMembres(groupe: any): MembrePopulation[] {
+  const detail = parseDetail(groupe.employesDetail);
+  if (detail.length === 0) return [];
+
+  // Nouveau format : chaque item est directement un MembrePopulation
+  if (detail[0] && "dateNaissance" in detail[0] && !("famille" in detail[0])) {
+    return detail.map((m: any, i: number) => ({
+      numero:        m.numero || i + 1,
+      nom:           m.nom || "",
+      dateNaissance: m.dateNaissance || "",
+      sexe:          m.sexe || "",
+      pieceIdentite: m.pieceIdentite || "",
+      lien:          m.lien || "",
+      dateAdhesion:  m.dateAdhesion || "",
+      salaire:       m.salaire,
+      garantie:      m.garantie || "Standard",
+      type:          m.type || typeFromDate(m.dateNaissance || ""),
+    }));
+  }
+
+  // Ancien format (employé + famille) — rétro-compatibilité
+  const result: MembrePopulation[] = [];
+  let n = 1;
+  for (const emp of detail) {
+    result.push({
+      numero: n++, nom: emp.nom || "", dateNaissance: emp.dateNaissance || "",
+      sexe: "", pieceIdentite: emp.matricule || "", lien: "Employé",
+      dateAdhesion: "", salaire: undefined, garantie: "Standard",
+      type: emp.type || typeFromDate(emp.dateNaissance || ""),
+    });
+    for (const m of (emp.famille || [])) {
+      result.push({
+        numero: n++, nom: m.nom || "", dateNaissance: m.dateNaissance || "",
+        sexe: "", pieceIdentite: "", lien: m.lien || "Famille",
+        dateAdhesion: "", salaire: undefined, garantie: "Standard",
+        type: m.type || typeFromDate(m.dateNaissance || ""),
+      });
+    }
+  }
+  return result;
 }
 
 

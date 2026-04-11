@@ -293,8 +293,13 @@ export default function NewGroupePage() {
           dureeGarantie: groupe.dureeGarantie || "1",
           echeanceAuto:  groupe.echeanceAuto  ?? true,
         });
-        if (groupe.membresDetail?.length) {
-          setMembres(groupe.membresDetail);
+        // employesDetail peut être une chaîne JSON (venant du backend) ou un tableau
+        let detail = groupe.employesDetail;
+        if (typeof detail === "string") {
+          try { detail = JSON.parse(detail); } catch { detail = []; }
+        }
+        if (Array.isArray(detail) && detail.length > 0) {
+          setMembres(detail);
           setFileName("population_chargée.xlsx");
         }
       })
@@ -358,7 +363,7 @@ export default function NewGroupePage() {
       prime:         (decompte.total * duree).toString(),
       primeNette:    (decompte.primeNette * duree).toString(),
       taxes:         (decompte.taxes * duree).toString(),
-      membresDetail: membres,
+      employesDetail: membres,
     };
     try {
       if (editingId) {

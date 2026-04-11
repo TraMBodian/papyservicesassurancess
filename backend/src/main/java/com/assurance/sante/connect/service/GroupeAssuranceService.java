@@ -66,10 +66,14 @@ public class GroupeAssuranceService {
             try { g.setStatut(GroupeAssurance.StatutContrat.valueOf(
                     data.get("statut").toString().toUpperCase())); } catch (Exception ignored) {}
         }
-        // Sérialiser la liste des employés en JSON
-        if (data.containsKey("employesDetail")) {
+        // Sérialiser la liste des membres/employés en JSON
+        // Accepter les deux clés : "employesDetail" (ancien) et "membresDetail" (nouveau)
+        Object detail = data.containsKey("employesDetail") ? data.get("employesDetail")
+                      : data.containsKey("membresDetail")  ? data.get("membresDetail")
+                      : null;
+        if (detail != null) {
             try {
-                g.setEmployesDetail(objectMapper.writeValueAsString(data.get("employesDetail")));
+                g.setEmployesDetail(objectMapper.writeValueAsString(detail));
             } catch (JsonProcessingException ignored) {}
         }
         return g;
