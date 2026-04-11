@@ -84,6 +84,58 @@ function downloadTemplate() {
   XLSX.writeFile(wb, "modele_population_groupe.xlsx");
 }
 
+// ─── Convertir une cellule date Excel en "yyyy-mm-dd" ─────────────────────────
+
+function toDateStr(rawDate: any): string {
+  if (!rawDate && rawDate !== 0) return "";
+  if (rawDate instanceof Date) {
+    const y = rawDate.getFullYear();
+    const m = String(rawDate.getMonth() + 1).padStart(2, "0");
+    const d = String(rawDate.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  if (typeof rawDate === "number") {
+    const jsDate = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
+    const y = jsDate.getUTCFullYear();
+    const m = String(jsDate.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(jsDate.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  if (typeof rawDate === "string") {
+    const s = rawDate.trim().replace(/\//g, "-");
+    const parts = s.split("-");
+    // dd-mm-yyyy → yyyy-mm-dd
+    if (parts.length === 3 && parts[0].length <= 2 && parts[2].length === 4) {
+      return `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+    }
+    return s;
+  }
+  return "";
+}
+
+// ─── Correspondance souple des noms de colonnes ───────────────────────────────
+
+const COL_ALIASES: Record<string, string[]> = {
+  numero:        ["n°", "no", "num", "numéro", "numero", "#"],
+  nom:           ["nom", "nom et prénom", "nom et prenom", "prénom", "prenom", "name", "full name", "nom complet"],
+  dateNaissance: ["date de naissance", "date naissance", "naissance", "dob", "date_naissance"],
+  sexe:          ["sexe", "genre", "sex", "gender"],
+  pieceIdentite: ["n° pièce", "n° piece", "piece identite", "pièce d'identité", "identite", "cin", "passeport", "id"],
+  lien:          ["lien", "lien avec", "lien avec l'adhérent", "parenté", "parente", "relation"],
+  dateAdhesion:  ["date d'adhésion", "date adhesion", "adhesion", "date_adhesion"],
+  salaire:       ["salaire", "salary", "revenu"],
+  garantie:      ["garantie", "plan", "formule"],
+};
+
+function findColIndex(headers: string[], field: string): number {
+  const aliases = COL_ALIASES[field] ?? [field];
+  for (let i = 0; i < headers.length; i++) {
+    const h = String(headers[i] ?? "").toLowerCase().trim();
+    if (aliases.some(a => h.includes(a) || a.includes(h))) return i;
+  }
+  return -1;
+}
+
 // ─── Parser le fichier Excel ──────────────────────────────────────────────────
 
 function parseExcel(file: File): Promise<MembrePopulation[]> {
@@ -100,53 +152,59 @@ function parseExcel(file: File): Promise<MembrePopulation[]> {
           reject(new Error("Le fichier ne contient pas de données")); return;
         }
 
-        // Détecter si la première ligne est bien un en-tête (non numérique)
-        const startRow = (typeof rows[0]?.[0] === "number" || rows[0]?.[0] == null) ? 0 : 1;
+        // Trouver la ligne d'en-tête : première ligne contenant du texte non vide
+        let headerRowIdx = 0;
+        for (let i = 0; i < Math.min(5, rows.length); i++) {
+          const row = rows[i];
+          if (row && row.some((c: any) => typeof c === "string" && c.trim().length > 1)) {
+            headerRowIdx = i;
+            break;
+          }
+        }
+        const headers = (rows[headerRowIdx] ?? []).map((h: any) => String(h ?? "").toLowerCase().trim());
+
+        // Mapper les colonnes par nom d'en-tête
+        const idx = {
+          numero:        findColIndex(headers, "numero"),
+          nom:           findColIndex(headers, "nom"),
+          dateNaissance: findColIndex(headers, "dateNaissance"),
+          sexe:          findColIndex(headers, "sexe"),
+          pieceIdentite: findColIndex(headers, "pieceIdentite"),
+          lien:          findColIndex(headers, "lien"),
+          dateAdhesion:  findColIndex(headers, "dateAdhesion"),
+          salaire:       findColIndex(headers, "salaire"),
+          garantie:      findColIndex(headers, "garantie"),
+        };
+
+        // Si aucun en-tête reconnu → fallback sur l'ordre des colonnes du modèle
+        const hasHeaders = idx.nom >= 0;
+        if (!hasHeaders) {
+          idx.numero = 0; idx.nom = 1; idx.dateNaissance = 2; idx.sexe = 3;
+          idx.pieceIdentite = 4; idx.lien = 5; idx.dateAdhesion = 6;
+          idx.salaire = 7; idx.garantie = 8;
+        }
+
+        const get = (row: any[], i: number) => (i >= 0 ? row[i] : undefined);
 
         const membres: MembrePopulation[] = [];
-        for (let i = startRow; i < rows.length; i++) {
+        for (let i = headerRowIdx + 1; i < rows.length; i++) {
           const row = rows[i];
-          if (!row || row.length === 0) continue;  // ignorer lignes vides
-          const nom = String(row[1] ?? "").trim();
+          if (!row || row.length === 0) continue;
+          const nom = String(get(row, idx.nom) ?? "").trim();
           if (!nom) continue;
 
-          // Normaliser la date de naissance
-          let dateNaissance = "";
-          const rawDate = row[2];
-          if (rawDate instanceof Date) {
-            // Utiliser les méthodes locales pour éviter le décalage UTC
-            const y = rawDate.getFullYear();
-            const m = String(rawDate.getMonth() + 1).padStart(2, "0");
-            const d = String(rawDate.getDate()).padStart(2, "0");
-            dateNaissance = `${y}-${m}-${d}`;
-          } else if (typeof rawDate === "string" && rawDate.trim()) {
-            const s = rawDate.trim().replace(/\//g, "-");
-            const parts = s.split("-");
-            if (parts.length === 3 && parts[0].length <= 2) {
-              // dd-mm-yyyy → yyyy-mm-dd
-              dateNaissance = `${parts[2]}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
-            } else {
-              dateNaissance = s;
-            }
-          } else if (typeof rawDate === "number") {
-            // Numéro série Excel → date JS (25569 = écart jours entre 1900-01-01 et 1970-01-01)
-            const jsDate = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
-            const y = jsDate.getUTCFullYear();
-            const m = String(jsDate.getUTCMonth() + 1).padStart(2, "0");
-            const d = String(jsDate.getUTCDate()).padStart(2, "0");
-            dateNaissance = `${y}-${m}-${d}`;
-          }
+          const dateNaissance = toDateStr(get(row, idx.dateNaissance));
 
           membres.push({
-            numero:        Number(row[0]) || i,
+            numero:        Number(get(row, idx.numero)) || (membres.length + 1),
             nom,
             dateNaissance,
-            sexe:          String(row[3] || "").trim(),
-            pieceIdentite: String(row[4] || "").trim(),
-            lien:          String(row[5] || "").trim(),
-            dateAdhesion:  String(row[6] || "").trim(),
-            salaire:       row[7] ? String(row[7]) : undefined,
-            garantie:      String(row[8] || "Standard").trim(),
+            sexe:          String(get(row, idx.sexe)          ?? "").trim(),
+            pieceIdentite: String(get(row, idx.pieceIdentite) ?? "").trim(),
+            lien:          String(get(row, idx.lien)          ?? "").trim(),
+            dateAdhesion:  toDateStr(get(row, idx.dateAdhesion)) || String(get(row, idx.dateAdhesion) ?? "").trim(),
+            salaire:       get(row, idx.salaire) != null ? String(get(row, idx.salaire)) : undefined,
+            garantie:      String(get(row, idx.garantie) ?? "Standard").trim() || "Standard",
             type:          typeFromDate(dateNaissance),
           });
         }
