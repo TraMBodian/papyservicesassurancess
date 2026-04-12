@@ -121,16 +121,16 @@ export class DataService {
   // Remboursements
   static async getRemboursements() {
     return withFallback(async () => {
-      const r = await (apiClient as any).getRemboursements?.();
-      return r?.remboursements ?? r;
+      const r = await apiClient.getRemboursements();
+      return r.remboursements;
     }, MOCK_REMBOURSEMENTS);
   }
 
   // Cartes
   static async getCartes() {
     return withFallback(async () => {
-      const r = await (apiClient as any).getCartes?.();
-      return r?.cartes ?? r;
+      const r = await apiClient.getCartes();
+      return r.cartes;
     }, MOCK_CARTES);
   }
 

@@ -42,8 +42,8 @@ public class AssureService {
             .prenom(assureDto.getPrenom())
             .telephone(assureDto.getTelephone())
             .email(assureDto.getEmail())
-            .statut(Assure.AssureStatut.valueOf(assureDto.getStatut() != null ? assureDto.getStatut() : "ACTIF"))
-            .type(Assure.AssureType.valueOf(assureDto.getType() != null ? assureDto.getType() : "FAMILLE"))
+            .statut(parseStatut(assureDto.getStatut()))
+            .type(parseType(assureDto.getType()))
             .adresse(assureDto.getAdresse())
             .prime(assureDto.getPrime())
             .dateDebut(assureDto.getDateDebut())
@@ -91,6 +91,18 @@ public class AssureService {
 
         assure = assureRepository.save(assure);
         return AssureDto.fromEntity(assure);
+    }
+
+    private Assure.AssureStatut parseStatut(String val) {
+        if (val == null) return Assure.AssureStatut.ACTIF;
+        try { return Assure.AssureStatut.valueOf(val.toUpperCase()); }
+        catch (IllegalArgumentException e) { return Assure.AssureStatut.ACTIF; }
+    }
+
+    private Assure.AssureType parseType(String val) {
+        if (val == null) return Assure.AssureType.FAMILLE;
+        try { return Assure.AssureType.valueOf(val.toUpperCase()); }
+        catch (IllegalArgumentException e) { return Assure.AssureType.FAMILLE; }
     }
 
     public void deleteAssure(Long id) {

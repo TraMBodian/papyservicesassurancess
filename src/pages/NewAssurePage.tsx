@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { toast } from "sonner";
 import { DataService } from "@/services/dataService";
 
 export default function NewAssurePage() {
@@ -24,12 +25,12 @@ export default function NewAssurePage() {
     e.preventDefault();
     try {
       await DataService.createAssure(formData);
-      alert("Assuré créé avec succès !");
+      toast.success("Assuré créé avec succès !");
       navigate('/assures');
     } catch (error) {
       console.error('Erreur lors de la création:', error);
       const message = error instanceof Error ? error.message : 'Erreur inconnue';
-      alert("Erreur lors de la création de l'assuré : " + message);
+      toast.error("Erreur lors de la création de l'assuré : " + message);
     }
   };
 

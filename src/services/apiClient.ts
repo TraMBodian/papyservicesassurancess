@@ -185,6 +185,16 @@ export class ApiClient {
     return this.request(`/familles/${id}`, { method: 'DELETE' });
   }
 
+  // Remboursements
+  async getRemboursements() {
+    return this.request<{ remboursements: any[] }>('/remboursements');
+  }
+
+  // Cartes (assurés avec carte)
+  async getCartes() {
+    return this.request<{ cartes: any[] }>('/cartes');
+  }
+
   // Groupes
   async getGroupes() {
     return this.request<any[]>('/groupes');

@@ -21,9 +21,9 @@ export default function CartesPage() {
 
   const filtered = assures.filter(
     (a) =>
-      a.nom.toLowerCase().includes(search.toLowerCase()) ||
-      a.prenom.toLowerCase().includes(search.toLowerCase()) ||
-      a.numero.toLowerCase().includes(search.toLowerCase())
+      (a.nom ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (a.prenom ?? "").toLowerCase().includes(search.toLowerCase()) ||
+      (a.numero ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   const generateQRCode = (numero: string) =>

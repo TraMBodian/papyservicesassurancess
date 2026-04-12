@@ -108,7 +108,7 @@ public class GroupeAssuranceService {
                     .email(str(m, "email"))
                     .statut(Assure.AssureStatut.ACTIF)
                     .type(Assure.AssureType.GROUPE)
-                    .adresse(lienVal)
+                    .adresse("")
                     .dateDebut(dateAdhVal.isEmpty() ? groupe.getDebut() : dateAdhVal)
                     .secteur(groupe.getEntreprise())
                     .prime(groupe.getPrime())

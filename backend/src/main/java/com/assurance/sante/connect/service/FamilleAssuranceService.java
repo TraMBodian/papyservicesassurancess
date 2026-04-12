@@ -70,6 +70,10 @@ public class FamilleAssuranceService {
 
             String cni = famille.getPieceIdentitePrincipal();
             String numero = (cni != null && !cni.isBlank()) ? "FAM-" + cni : prefix + "0";
+            // Fallback si collision avec un autre assuré hors de cette famille
+            if (assureRepository.findByNumero(numero).isPresent()) {
+                numero = prefix + "0";
+            }
 
             Assure principal = Assure.builder()
                 .numero(numero)
@@ -86,9 +90,7 @@ public class FamilleAssuranceService {
                 .garantie("Standard")
                 .build();
 
-            if (assureRepository.findByNumero(numero).isEmpty()) {
-                assureRepository.save(principal);
-            }
+            assureRepository.save(principal);
         }
 
         // 2. Bénéficiaires depuis beneficiairesDetail (JSON)
