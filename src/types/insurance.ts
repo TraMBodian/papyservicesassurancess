@@ -3,18 +3,24 @@ export interface Assure {
   numero: string;
   nom: string;
   prenom: string;
-  dateNaissance: string;
-  sexe: string;
-  telephone: string;
-  adresse: string;
-  email: string;
-  pieceIdentite: string;
-  profession: string;
-  dateSouscription: string;
-  dateDebut: string;
-  dateFin: string;
-  statut: "Actif" | "Suspendu" | "Résilié";
-  type: "famille" | "groupe";
+  dateNaissance?: string;
+  sexe?: string;
+  telephone?: string;
+  adresse?: string;
+  email?: string;
+  pieceIdentite?: string;
+  profession?: string;
+  dateSouscription?: string;
+  dateDebut?: string;
+  dateFin?: string;
+  dateAdhesion?: string;
+  lien?: string;
+  salaire?: string;
+  garantie?: string;
+  secteur?: string;
+  prime?: string;
+  statut: string;
+  type: string;
 }
 
 export interface Beneficiaire {

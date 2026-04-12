@@ -25,7 +25,6 @@ public class Assure {
     private String prenom;
 
     private String telephone;
-
     private String email;
 
     @Column(nullable = false)
@@ -37,7 +36,6 @@ public class Assure {
     private AssureType type = AssureType.FAMILLE;
 
     private String adresse;
-
     private String prime;
     private String dateDebut;
     private String dateFin;
@@ -51,20 +49,30 @@ public class Assure {
     private Integer employes;
     private Integer assures;
 
+    // ── Nouveaux champs (format Excel / population) ───────────────────────────
+    @Column(name = "date_naissance")
+    private String dateNaissance;
+
+    private String sexe;
+
+    @Column(name = "piece_identite")
+    private String pieceIdentite;
+
+    /** Lien avec l'adhérent principal : Principal, Conjoint, Enfant, etc. */
+    private String lien;
+
+    @Column(name = "date_adhesion")
+    private String dateAdhesion;
+
+    private String salaire;
+    private String garantie;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    public enum AssureStatut {
-        ACTIF,
-        SUSPENDU,
-        RESILIE
-    }
-
-    public enum AssureType {
-        FAMILLE,
-        GROUPE
-    }
+    public enum AssureStatut { ACTIF, SUSPENDU, RESILIE }
+    public enum AssureType   { FAMILLE, GROUPE }
 }

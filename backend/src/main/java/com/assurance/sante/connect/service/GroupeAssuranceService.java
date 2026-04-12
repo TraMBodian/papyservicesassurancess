@@ -96,6 +96,10 @@ public class GroupeAssuranceService {
                     numero = prefix + i;
                 }
 
+                String lienVal      = str(m, "lien");
+                String dateAdhVal   = str(m, "dateAdhesion");
+                String dateNaissVal = str(m, "dateNaissance");
+
                 Assure assure = Assure.builder()
                     .numero(numero)
                     .nom(nom)
@@ -104,10 +108,18 @@ public class GroupeAssuranceService {
                     .email(str(m, "email"))
                     .statut(Assure.AssureStatut.ACTIF)
                     .type(Assure.AssureType.GROUPE)
-                    .adresse(str(m, "lien"))        // lien avec l'adhérent principal
-                    .dateDebut(str(m, "dateAdhesion").isEmpty() ? groupe.getDebut() : str(m, "dateAdhesion"))
-                    .secteur(groupe.getEntreprise()) // entreprise = secteur d'appartenance
+                    .adresse(lienVal)
+                    .dateDebut(dateAdhVal.isEmpty() ? groupe.getDebut() : dateAdhVal)
+                    .secteur(groupe.getEntreprise())
                     .prime(groupe.getPrime())
+                    // Champs population complets
+                    .dateNaissance(dateNaissVal)
+                    .sexe(str(m, "sexe"))
+                    .pieceIdentite(piece)
+                    .lien(lienVal.isEmpty() ? "Principal" : lienVal)
+                    .dateAdhesion(dateAdhVal.isEmpty() ? groupe.getDebut() : dateAdhVal)
+                    .salaire(str(m, "salaire"))
+                    .garantie(str(m, "garantie").isEmpty() ? "Standard" : str(m, "garantie"))
                     .build();
 
                 assureRepository.save(assure);

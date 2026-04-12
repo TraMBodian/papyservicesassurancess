@@ -25,24 +25,40 @@ public class AssureDto {
     private Integer employes;
     private Integer assures;
 
-    public static AssureDto fromEntity(Assure assure) {
+    // Champs population
+    private String dateNaissance;
+    private String sexe;
+    private String pieceIdentite;
+    private String lien;
+    private String dateAdhesion;
+    private String salaire;
+    private String garantie;
+
+    public static AssureDto fromEntity(Assure a) {
         return AssureDto.builder()
-            .id(assure.getId())
-            .numero(assure.getNumero())
-            .nom(assure.getNom())
-            .prenom(assure.getPrenom())
-            .telephone(assure.getTelephone())
-            .email(assure.getEmail())
-            .statut(assure.getStatut().name())
-            .type(assure.getType().name())
-            .adresse(assure.getAdresse())
-            .prime(assure.getPrime())
-            .dateDebut(assure.getDateDebut())
-            .dateFin(assure.getDateFin())
-            .beneficiaires(assure.getBeneficiaires())
-            .secteur(assure.getSecteur())
-            .employes(assure.getEmployes())
-            .assures(assure.getAssures())
+            .id(a.getId())
+            .numero(a.getNumero())
+            .nom(a.getNom())
+            .prenom(a.getPrenom())
+            .telephone(a.getTelephone())
+            .email(a.getEmail())
+            .statut(a.getStatut().name())
+            .type(a.getType().name())
+            .adresse(a.getAdresse())
+            .prime(a.getPrime())
+            .dateDebut(a.getDateDebut())
+            .dateFin(a.getDateFin())
+            .beneficiaires(a.getBeneficiaires())
+            .secteur(a.getSecteur())
+            .employes(a.getEmployes())
+            .assures(a.getAssures())
+            .dateNaissance(a.getDateNaissance())
+            .sexe(a.getSexe())
+            .pieceIdentite(a.getPieceIdentite())
+            .lien(a.getLien())
+            .dateAdhesion(a.getDateAdhesion())
+            .salaire(a.getSalaire())
+            .garantie(a.getGarantie())
             .build();
     }
 }

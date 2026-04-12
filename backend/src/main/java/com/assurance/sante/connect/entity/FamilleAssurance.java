@@ -34,6 +34,18 @@ public class FamilleAssurance {
     @Column(name = "beneficiaire", length = 500)
     private List<String> beneficiaires;
 
+    /** Détail JSON des bénéficiaires (dateNaissance, sexe, lien, etc.) */
+    @Column(name = "beneficiaires_detail", columnDefinition = "TEXT")
+    private String beneficiairesDetail;
+
+    /** Date de naissance du principal */
+    @Column(name = "date_naissance_principal")
+    private String dateNaissancePrincipal;
+
+    /** Pièce d'identité du principal */
+    @Column(name = "piece_identite_principal")
+    private String pieceIdentitePrincipal;
+
     @Column(name = "date_debut")
     private String dateDebut;
 

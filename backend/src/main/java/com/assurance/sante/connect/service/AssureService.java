@@ -52,6 +52,13 @@ public class AssureService {
             .secteur(assureDto.getSecteur())
             .employes(assureDto.getEmployes())
             .assures(assureDto.getAssures())
+            .dateNaissance(assureDto.getDateNaissance())
+            .sexe(assureDto.getSexe())
+            .pieceIdentite(assureDto.getPieceIdentite())
+            .lien(assureDto.getLien())
+            .dateAdhesion(assureDto.getDateAdhesion())
+            .salaire(assureDto.getSalaire())
+            .garantie(assureDto.getGarantie())
             .build();
 
         assure = assureRepository.save(assure);
@@ -71,9 +78,16 @@ public class AssureService {
         if (assureDto.getDateDebut() != null) assure.setDateDebut(assureDto.getDateDebut());
         if (assureDto.getDateFin() != null) assure.setDateFin(assureDto.getDateFin());
         if (assureDto.getBeneficiaires() != null) assure.setBeneficiaires(assureDto.getBeneficiaires());
-        if (assureDto.getSecteur() != null) assure.setSecteur(assureDto.getSecteur());
-        if (assureDto.getEmployes() != null) assure.setEmployes(assureDto.getEmployes());
-        if (assureDto.getAssures() != null) assure.setAssures(assureDto.getAssures());
+        if (assureDto.getSecteur() != null)      assure.setSecteur(assureDto.getSecteur());
+        if (assureDto.getEmployes() != null)     assure.setEmployes(assureDto.getEmployes());
+        if (assureDto.getAssures() != null)      assure.setAssures(assureDto.getAssures());
+        if (assureDto.getDateNaissance() != null) assure.setDateNaissance(assureDto.getDateNaissance());
+        if (assureDto.getSexe() != null)          assure.setSexe(assureDto.getSexe());
+        if (assureDto.getPieceIdentite() != null) assure.setPieceIdentite(assureDto.getPieceIdentite());
+        if (assureDto.getLien() != null)          assure.setLien(assureDto.getLien());
+        if (assureDto.getDateAdhesion() != null)  assure.setDateAdhesion(assureDto.getDateAdhesion());
+        if (assureDto.getSalaire() != null)       assure.setSalaire(assureDto.getSalaire());
+        if (assureDto.getGarantie() != null)      assure.setGarantie(assureDto.getGarantie());
 
         assure = assureRepository.save(assure);
         return AssureDto.fromEntity(assure);
