@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Plus, X, RefreshCw, ChevronDown, ChevronUp, User, Users } from "lucide-react";
+import { ArrowLeft, Plus, X, RefreshCw, ChevronDown, ChevronUp, User, Users, FileText, Globe } from "lucide-react";
 import { toast } from "sonner";
 import { DataService } from "@/services/dataService";
 import { getTarifs, type TarifSettings } from "@/services/tarifService";
@@ -140,6 +140,7 @@ export default function NewFamillePage() {
   const [editingId, setEditingId]         = useState<number | null>(null);
   const [showGaranties, setShowGaranties] = useState(false);
   const [showReajust, setShowReajust]     = useState(false);
+  const [showConditions, setShowConditions] = useState(false);
   const [expandedBen, setExpandedBen]     = useState<number | null>(null);
 
   const [photo, setPhoto] = useState<string>("");
@@ -166,6 +167,7 @@ export default function NewFamillePage() {
   }));
   const [cpManuel,          setCpManuel]          = useState<string>("");
   const [tauxRemboursement, setTauxRemboursement] = useState<number>(0);
+  const [territorialite, setTerritorialite] = useState({ senegal: "", afrique: "", resteMonde: "" });
 
   const dateFin = useMemo(() => {
     if (!formData.dateDebut) return "";
@@ -179,9 +181,8 @@ export default function NewFamillePage() {
     () => calcDecompte(beneficiaires, souscripteur.type, tarifs),
     [beneficiaires, souscripteur.type, tarifs]
   );
-  const tauxCpEffectif = cpManuel !== "" && !isNaN(Number(cpManuel)) ? Number(cpManuel) : decompte.tauxCP;
-  const cpEffectif     = Math.round(decompte.primeNette * tauxCpEffectif / 100);
-  const totalEffectif  = decompte.primeNette + cpEffectif + decompte.taxes;
+  const cpEffectif    = cpManuel !== "" && !isNaN(Number(cpManuel)) ? Number(cpManuel) : 0;
+  const totalEffectif = decompte.primeNette + cpEffectif + decompte.taxes;
 
   const addBeneficiaire = () => {
     setBeneficiaires(prev => [...prev, newBeneficiaire()]);
@@ -260,6 +261,15 @@ export default function NewFamillePage() {
       tarifPrimeEnfant:        tarifs.primeEnfant,
       tarifPrimeAdulte:        tarifs.primeAdulte,
       tarifPrimeAdulteAge:     tarifs.primeAdulteAge,
+      territorialite:          JSON.stringify(territorialite),
+      plafondDentaire:         tarifs.plafondDentaire,
+      plafondOptique:          tarifs.plafondOptique,
+      plafondHospitalisationJour: tarifs.plafondHospitalisationJour,
+      plafondOrthophonie:      tarifs.plafondOrthophonie,
+      plafondMaterniteSimple:  tarifs.plafondMaterniteSimple,
+      plafondMaterniteGemellaire: tarifs.plafondMaterniteGemellaire,
+      plafondMaterniteChirurgical: tarifs.plafondMaterniteChirurgical,
+      plafondTransport:        tarifs.plafondTransport,
     };
     try {
       if (editingId) {
@@ -614,6 +624,37 @@ export default function NewFamillePage() {
                 </div>
               </div>
 
+              {/* Plafonds de remboursement */}
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 mt-1">Plafonds de remboursement</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {([
+                    ["plafondDentaire",             "Dentaire"],
+                    ["plafondOptique",              "Optique"],
+                    ["plafondHospitalisationJour",  "Hospit./jour"],
+                    ["plafondOrthophonie",          "Orthophonie"],
+                    ["plafondMaterniteSimple",      "Maternité simple"],
+                    ["plafondMaterniteGemellaire",  "Maternité gémell."],
+                    ["plafondMaterniteChirurgical", "Maternité chir."],
+                    ["plafondTransport",            "Transport"],
+                  ] as [keyof typeof tarifs, string][]).map(([key, label]) => (
+                    <div key={key}>
+                      <Label className="text-xs">{label}</Label>
+                      <div className="flex items-center gap-1.5 mt-1">
+                        <Input
+                          type="number" min={0} step={5000}
+                          value={(tarifs[key] as number) === 0 ? "" : (tarifs[key] as number)}
+                          onChange={e => setTarifs(t => ({ ...t, [key]: e.target.value === "" ? 0 : Number(e.target.value) }))}
+                          placeholder="0"
+                          className="text-right font-mono text-sm"
+                        />
+                        <span className="text-xs text-muted-foreground shrink-0">FCFA</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Calcul direct : part remboursée par personne/an */}
               {tauxRemboursement > 0 && (tarifs.primeEnfant > 0 || tarifs.primeAdulte > 0 || tarifs.primeAdulteAge > 0) && (
                 <div className="rounded-lg border border-green-200 bg-green-50 p-3 grid grid-cols-3 gap-3 text-xs">
@@ -632,6 +673,35 @@ export default function NewFamillePage() {
                   ))}
                 </div>
               )}
+            </section>
+
+            {/* ── Territorialité ────────────────────────────────────────── */}
+            <section className="space-y-4">
+              <h3 className="font-semibold text-base border-b pb-2 flex items-center gap-2">
+                <Globe className="w-4 h-4 text-green-600" /> Territorialité
+              </h3>
+              <p className="text-xs text-muted-foreground -mt-2">Taux de prise en charge selon la zone géographique des soins.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {([
+                  { key: "senegal",    label: "Sénégal",        bg: "bg-green-50",  border: "border-green-200",  text: "text-green-700"  },
+                  { key: "afrique",    label: "Afrique",        bg: "bg-blue-50",   border: "border-blue-200",   text: "text-blue-700"   },
+                  { key: "resteMonde", label: "Reste du monde", bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700" },
+                ] as const).map(({ key, label, bg, border, text }) => (
+                  <div key={key} className={`p-4 rounded-lg border ${border} ${bg}`}>
+                    <Label className={`${text} font-semibold text-sm`}>{label}</Label>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Input
+                        type="number" min={0} max={100} step={1}
+                        value={territorialite[key]}
+                        onChange={e => setTerritorialite(t => ({ ...t, [key]: e.target.value }))}
+                        placeholder="0"
+                        className="text-right font-mono"
+                      />
+                      <span className="text-sm font-semibold text-muted-foreground">%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
 
             {/* ── Décompte de la prime ─────────────────────────────────── */}
@@ -670,26 +740,20 @@ export default function NewFamillePage() {
                   </div>
                 ))}
 
-                {/* CP — saisie manuelle (%) */}
+                {/* CP — saisie directe en FCFA */}
                 <div className="flex items-center justify-between px-4 py-2.5 border-t gap-4">
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium">Coût de police</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      Montant : {(cpEffectif * Number(formData.dureeGarantie)).toLocaleString("fr-FR")} FCFA
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium">Coût de police</span>
                   <div className="flex items-center gap-2 shrink-0">
                     <input
                       type="number"
                       min={0}
-                      max={100}
-                      step={0.1}
+                      step={500}
                       value={cpManuel}
                       onChange={e => setCpManuel(e.target.value)}
-                      placeholder={String(decompte.tauxCP)}
-                      className="w-24 text-right font-mono text-sm border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      placeholder="0"
+                      className="w-36 text-right font-mono text-sm border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                     />
-                    <span className="text-sm font-semibold text-muted-foreground">%</span>
+                    <span className="text-sm font-semibold text-muted-foreground shrink-0">FCFA</span>
                     {cpManuel !== "" && (
                       <button type="button" onClick={() => setCpManuel("")}
                         className="text-gray-400 hover:text-gray-600" title="Réinitialiser">
@@ -739,6 +803,73 @@ export default function NewFamillePage() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </section>
+
+            {/* ── Conditions de souscription ───────────────────────────── */}
+            <section>
+              <button type="button" onClick={() => setShowConditions(!showConditions)}
+                className="w-full flex items-center justify-between p-3 rounded-lg border bg-gray-50 hover:bg-gray-100 transition-colors">
+                <span className="font-semibold text-sm flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-600" /> Conditions de souscription
+                </span>
+                {showConditions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {showConditions && (
+                <div className="mt-2 rounded-lg border overflow-hidden text-sm">
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <p className="font-bold text-blue-700 uppercase text-xs tracking-wider mb-2">I. Conditions d'adhésion</p>
+                      <ul className="space-y-1 text-gray-700">
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Souscripteur âgé de 18 à 65 ans révolus à la date d'effet du contrat.</li>
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Bénéficiaires : conjoint(e), enfants à charge (0–21 ans ; 25 ans si études) ; ascendants à charge de moins de 65 ans.</li>
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Résidence habituelle au Sénégal ou dans la zone de territorialité du contrat.</li>
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Déclaration sincère et complète de l'état de santé de chaque bénéficiaire.</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-bold text-blue-700 uppercase text-xs tracking-wider mb-2">II. Documents requis</p>
+                      <ul className="space-y-1 text-gray-700">
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Formulaire de souscription dûment complété et signé.</li>
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Pièce d'identité valide du souscripteur (CNI, passeport ou titre de séjour).</li>
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Acte de mariage (pour le conjoint) et actes de naissance des enfants.</li>
+                        <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Questionnaire médical pour les personnes de 50 ans et plus.</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="font-bold text-amber-700 uppercase text-xs tracking-wider mb-2">III. Délais de carence</p>
+                      <div className="rounded-lg border overflow-hidden">
+                        <table className="w-full text-xs">
+                          <thead><tr className="bg-amber-50 border-b"><th className="text-left p-2.5 font-semibold">Type de prestation</th><th className="p-2.5 font-semibold text-right">Délai</th></tr></thead>
+                          <tbody>
+                            {[
+                              { type: "Soins courants (hors accidents)", delai: "1 mois" },
+                              { type: "Soins dentaires",                 delai: "3 mois" },
+                              { type: "Optique",                         delai: "6 mois" },
+                              { type: "Maternité",                       delai: "9 mois" },
+                              { type: "Accidents corporels",             delai: "Aucun"  },
+                            ].map((r, i) => (
+                              <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                                <td className="p-2.5">{r.type}</td>
+                                <td className={`p-2.5 text-right font-semibold ${r.delai === "Aucun" ? "text-green-600" : "text-amber-700"}`}>{r.delai}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="font-bold text-red-700 uppercase text-xs tracking-wider mb-2">IV. Principales exclusions</p>
+                      <ul className="space-y-1 text-gray-700">
+                        <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Affections et maladies préexistantes à la date d'adhésion.</li>
+                        <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Chirurgie esthétique non consécutive à un accident.</li>
+                        <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Traitements expérimentaux non reconnus par les autorités sanitaires.</li>
+                        <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Hospitalisations résultant de conflits armés ou catastrophes naturelles.</li>
+                        <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Soins à l'étranger hors options Afrique ou Reste du Monde souscrites.</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               )}
             </section>

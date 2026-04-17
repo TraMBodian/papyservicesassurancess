@@ -382,7 +382,7 @@ export default function MaladieGroupePage() {
                           <div>
                             <p className="text-xs text-muted-foreground">Total à payer</p>
                             <p className="font-bold text-sm text-blue-700">
-                              {(decompte.total * duree).toLocaleString("fr-FR")} FCFA
+                              {(Number(groupe.prime) > 0 ? Number(groupe.prime) * duree : decompte.total * duree).toLocaleString("fr-FR")} FCFA
                             </p>
                           </div>
                         </div>
@@ -411,8 +411,8 @@ export default function MaladieGroupePage() {
                                 { label: `Adultes (${decompte.nb.adulte})`,        val: decompte.primeAdultes * duree,    show: decompte.nb.adulte > 0 },
                                 { label: `Personnes âgées (${decompte.nb.adulte_age})`, val: decompte.primeAdultesAge * duree, show: decompte.nb.adulte_age > 0 },
                                 { label: "Prime nette (= Population)",       val: decompte.primeNette * duree,  show: true, bold: true },
-                                { label: `Coût de police (${decompte.tauxCP} %)`, val: decompte.cp * duree, show: true },
-                                { label: `Taxes (${decompte.tauxTaxe.toFixed(1)} %)`, val: decompte.taxes * duree, show: true },
+                                { label: "Coût de police", val: (Number(groupe.cp) || decompte.cp) * duree, show: true },
+                                { label: "Taxes (10 %)", val: decompte.taxes * duree, show: true },
                               ].filter(r => r.show).map((row, idx) => (
                                 <div key={idx} className={`flex justify-between px-4 py-2.5 border-t ${(row as any).bold ? "bg-blue-50 font-semibold" : ""}`}>
                                   <span>{row.label}</span>
@@ -423,7 +423,7 @@ export default function MaladieGroupePage() {
                               ))}
                               <div className="flex justify-between px-4 py-3 border-t bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold">
                                 <span>TOTAL À PAYER</span>
-                                <span className="font-mono">{(decompte.total * duree).toLocaleString("fr-FR")} FCFA</span>
+                                <span className="font-mono">{(Number(groupe.prime) > 0 ? Number(groupe.prime) * duree : decompte.total * duree).toLocaleString("fr-FR")} FCFA</span>
                               </div>
                             </div>
 

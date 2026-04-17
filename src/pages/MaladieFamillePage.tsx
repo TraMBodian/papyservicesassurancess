@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Plus, Search, Users, UserCheck, TrendingUp, Pencil, Trash2,
-  Calendar, RefreshCw, ShieldCheck, ChevronDown, ChevronUp,
+  Calendar, RefreshCw, ShieldCheck, ChevronDown, ChevronUp, FileText, Globe,
 } from "lucide-react";
 import { PhotoAvatar } from "@/components/PhotoUpload";
 import { motion } from "framer-motion";
@@ -56,6 +56,7 @@ export default function MaladieFamillePage() {
   const [search, setSearch]         = useState("");
   const [showGaranties, setShowGaranties] = useState(false);
   const [showReajust, setShowReajust]     = useState(false);
+  const [showConditions, setShowConditions] = useState(false);
   const [expanded, setExpanded]     = useState<number | null>(null);
   const tarifs = getTarifs();
 
@@ -188,6 +189,84 @@ export default function MaladieFamillePage() {
                   ))}
                 </tbody>
               </table>
+            </motion.div>
+          )}
+        </Card>
+
+        {/* ── Conditions de souscription (collapsible) ── */}
+        <Card className="overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setShowConditions(!showConditions)}
+            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600" />
+              <div className="text-left">
+                <p className="font-semibold text-sm">Conditions de souscription</p>
+                <p className="text-xs text-muted-foreground">Conditions d'adhésion, documents requis, délais de carence et exclusions</p>
+              </div>
+            </div>
+            {showConditions ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
+          </button>
+          {showConditions && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="border-t"
+            >
+              <div className="p-5 space-y-5 text-sm">
+                <div>
+                  <p className="font-bold text-blue-700 uppercase text-xs tracking-wider mb-2">I. Conditions d'adhésion</p>
+                  <ul className="space-y-1 text-gray-700">
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Souscripteur âgé de 18 à 65 ans révolus à la date d'effet du contrat.</li>
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Bénéficiaires : conjoint(e), enfants à charge (0–21 ans ; 25 ans si études) ; ascendants à charge de moins de 65 ans.</li>
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Résidence habituelle au Sénégal ou dans la zone de territorialité du contrat.</li>
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Déclaration sincère et complète de l'état de santé de chaque bénéficiaire.</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold text-blue-700 uppercase text-xs tracking-wider mb-2">II. Documents requis</p>
+                  <ul className="space-y-1 text-gray-700">
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Formulaire de souscription dûment complété et signé.</li>
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Pièce d'identité valide du souscripteur (CNI, passeport ou titre de séjour).</li>
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Acte de mariage (pour le conjoint) et actes de naissance des enfants.</li>
+                    <li className="flex gap-2"><span className="text-blue-400 shrink-0">•</span>Questionnaire médical pour les personnes de 50 ans et plus.</li>
+                  </ul>
+                </div>
+                <div>
+                  <p className="font-bold text-amber-700 uppercase text-xs tracking-wider mb-2">III. Délais de carence</p>
+                  <div className="rounded-lg border overflow-hidden">
+                    <table className="w-full text-xs">
+                      <thead><tr className="bg-amber-50 border-b"><th className="text-left p-2.5 font-semibold">Type de prestation</th><th className="p-2.5 font-semibold text-right">Délai</th></tr></thead>
+                      <tbody>
+                        {[
+                          { type: "Soins courants (hors accidents)", delai: "1 mois" },
+                          { type: "Soins dentaires",                 delai: "3 mois" },
+                          { type: "Optique",                         delai: "6 mois" },
+                          { type: "Maternité",                       delai: "9 mois" },
+                          { type: "Accidents corporels",             delai: "Aucun"  },
+                        ].map((r, i) => (
+                          <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                            <td className="p-2.5">{r.type}</td>
+                            <td className={`p-2.5 text-right font-semibold ${r.delai === "Aucun" ? "text-green-600" : "text-amber-700"}`}>{r.delai}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div>
+                  <p className="font-bold text-red-700 uppercase text-xs tracking-wider mb-2">IV. Principales exclusions</p>
+                  <ul className="space-y-1 text-gray-700">
+                    <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Affections et maladies préexistantes à la date d'adhésion.</li>
+                    <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Chirurgie esthétique non consécutive à un accident.</li>
+                    <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Traitements expérimentaux non reconnus par les autorités sanitaires.</li>
+                    <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Hospitalisations résultant de conflits armés ou catastrophes naturelles.</li>
+                    <li className="flex gap-2"><span className="text-red-400 shrink-0">✕</span>Soins à l'étranger hors options Afrique ou Reste du Monde souscrites.</li>
+                  </ul>
+                </div>
+              </div>
             </motion.div>
           )}
         </Card>
@@ -363,7 +442,7 @@ export default function MaladieFamillePage() {
                           <div>
                             <p className="text-xs text-muted-foreground">Total à payer</p>
                             <p className="font-bold text-sm text-blue-700">
-                              {(decompte.total * duree).toLocaleString("fr-FR")} FCFA
+                              {(Number(famille.prime) > 0 ? Number(famille.prime) * duree : decompte.total * duree).toLocaleString("fr-FR")} FCFA
                             </p>
                           </div>
                         </div>
@@ -390,8 +469,8 @@ export default function MaladieFamillePage() {
                               { label: `Adultes (${decompte.nb.adulte})`,     val: decompte.primeAdultes    * duree, show: decompte.nb.adulte > 0 },
                               { label: `Personnes âgées (${decompte.nb.adulte_age})`, val: decompte.primeAdultesAge * duree, show: decompte.nb.adulte_age > 0 },
                               { label: "Prime nette (= Population)",          val: decompte.primeNette      * duree, show: true, bold: true },
-                              { label: `Coût de police (${decompte.tauxCP} %)`, val: decompte.cp * duree, show: true },
-                              { label: `Taxes (${decompte.tauxTaxe.toFixed(1)} %)`, val: decompte.taxes    * duree, show: true },
+                              { label: "Coût de police", val: (Number(famille.cp) || decompte.cp) * duree, show: true },
+                              { label: "Taxes (10 %)", val: decompte.taxes * duree, show: true },
                             ].filter(r => r.show).map((row, idx) => (
                               <div key={idx} className={`flex justify-between px-4 py-2.5 border-t ${row.bold ? "bg-blue-50 font-semibold" : ""}`}>
                                 <span>{row.label}</span>
@@ -402,7 +481,7 @@ export default function MaladieFamillePage() {
                             ))}
                             <div className="flex justify-between px-4 py-3 border-t bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold">
                               <span>TOTAL À PAYER</span>
-                              <span className="font-mono">{(decompte.total * duree).toLocaleString("fr-FR")} FCFA</span>
+                              <span className="font-mono">{(Number(famille.prime) > 0 ? Number(famille.prime) * duree : decompte.total * duree).toLocaleString("fr-FR")} FCFA</span>
                             </div>
                           </motion.div>
                         )}

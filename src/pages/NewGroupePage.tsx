@@ -660,9 +660,8 @@ export default function NewGroupePage() {
   const decompte      = useMemo(() => calcDecomptePopulation(membres, tarifs), [membres, tarifs]);
   const duree         = Number(formData.dureeGarantie);
   // CP effectif : taux saisi par l'admin (%), sinon taux par défaut du service
-  const tauxCpEffectif = cpManuel !== "" && !isNaN(Number(cpManuel)) ? Number(cpManuel) : decompte.tauxCP;
-  const cpEffectif     = Math.round(decompte.primeNette * tauxCpEffectif / 100);
-  const totalEffectif  = decompte.primeNette + cpEffectif + decompte.taxes;
+  const cpEffectif    = cpManuel !== "" && !isNaN(Number(cpManuel)) ? Number(cpManuel) : 0;
+  const totalEffectif = decompte.primeNette + cpEffectif + decompte.taxes;
   const familleGroups = useMemo(() => groupByPrincipal(membres), [membres]);
   const validationErrors = parseResult?.errors ?? [];
 
@@ -1056,26 +1055,20 @@ export default function NewGroupePage() {
           </div>
         ))}
 
-        {/* CP — taux saisi par l'admin */}
+        {/* CP — saisie directe en FCFA */}
         <div className="flex items-center justify-between px-4 py-2.5 border-t gap-4">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-medium">Coût de police</span>
-            <span className="text-[11px] text-muted-foreground">
-              Montant : {(cpEffectif * duree).toLocaleString("fr-FR")} FCFA
-            </span>
-          </div>
+          <span className="text-sm font-medium">Coût de police</span>
           <div className="flex items-center gap-2 shrink-0">
             <input
               type="number"
               min={0}
-              max={100}
-              step={0.1}
+              step={500}
               value={cpManuel}
               onChange={e => setCpManuel(e.target.value)}
-              placeholder={String(decompte.tauxCP)}
-              className="w-24 text-right font-mono text-sm border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              placeholder="0"
+              className="w-36 text-right font-mono text-sm border rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
             />
-            <span className="text-sm font-semibold text-muted-foreground">%</span>
+            <span className="text-sm font-semibold text-muted-foreground shrink-0">FCFA</span>
             {cpManuel !== "" && (
               <button type="button" onClick={() => setCpManuel("")}
                 className="text-gray-400 hover:text-gray-600" title="Réinitialiser">
@@ -1272,6 +1265,37 @@ export default function NewGroupePage() {
                       />
                       <span className="text-xs text-muted-foreground shrink-0">%</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Plafonds de remboursement */}
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 mt-1">Plafonds de remboursement</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {([
+                      ["plafondDentaire",             "Dentaire"],
+                      ["plafondOptique",              "Optique"],
+                      ["plafondHospitalisationJour",  "Hospit./jour"],
+                      ["plafondOrthophonie",          "Orthophonie"],
+                      ["plafondMaterniteSimple",      "Maternité simple"],
+                      ["plafondMaterniteGemellaire",  "Maternité gémell."],
+                      ["plafondMaterniteChirurgical", "Maternité chir."],
+                      ["plafondTransport",            "Transport"],
+                    ] as [keyof typeof tarifs, string][]).map(([key, label]) => (
+                      <div key={key}>
+                        <Label className="text-xs">{label}</Label>
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <Input
+                            type="number" min={0} step={5000}
+                            value={(tarifs[key] as number) === 0 ? "" : (tarifs[key] as number)}
+                            onChange={e => setTarifs(t => ({ ...t, [key]: e.target.value === "" ? 0 : Number(e.target.value) }))}
+                            placeholder="0"
+                            className="text-right font-mono text-sm"
+                          />
+                          <span className="text-xs text-muted-foreground shrink-0">FCFA</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
