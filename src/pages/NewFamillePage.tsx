@@ -62,22 +62,30 @@ export interface Beneficiaire {
 
 // ─── Tableau des garanties (source : CNART Assurances) ────────────────────────
 
-export const GARANTIES_CNART = [
-  { categorie: "Honoraires médicaux",    actes: "Consultations, visites, actes de pratique médicale courante, petite chirurgie", taux: "80 %", plafond: "Selon barème du Syndicat des Médecins Privés du Sénégal" },
-  { categorie: "Pharmacie",              actes: "Produits pharmaceutiques remboursés",                                           taux: "80 %", plafond: "—" },
-  { categorie: "Auxiliaires médicaux",   actes: "Soins infirmiers, Kinésithérapie / Rééducation, Traitements psychiatriques",   taux: "80 %", plafond: "Soumis à entente préalable" },
-  { categorie: "Analyses biologiques",   actes: "Analyses",                                                                     taux: "80 %", plafond: "—" },
-  { categorie: "Imagerie médicale",      actes: "Radio, Scanner et IRM en externe",                                             taux: "80 %", plafond: "—" },
-  { categorie: "Soins dentaires",        actes: "Soins et prothèses dentaires",                                                 taux: "80 %", plafond: "250 000 FCFA / bénéficiaire" },
-  { categorie: "Optique",                actes: "Verres & montures",                                                            taux: "80 %", plafond: "250 000 FCFA / bénéficiaire · Renouvelable tous les 2 ans" },
-  { categorie: "Hospitalisation — Clinique", actes: "Frais de chambre en hospitalisation médicale et frais annexes",           taux: "80 %", plafond: "45 000 FCFA / jour" },
-  { categorie: "Hospitalisation — Hôpital", actes: "Hospitalisation médicale",                                                 taux: "80 %", plafond: "1ère catégorie de l'Hôpital Principal" },
-  { categorie: "Orthophonie",            actes: "Séances d'orthophonie",                                                       taux: "80 %", plafond: "100 000 FCFA / bénéficiaire / an" },
-  { categorie: "Maternité — Simple",     actes: "Frais d'accouchement simple normal",                                          taux: "80 %", plafond: "400 000 FCFA / évènement · Délai d'attente : 9 mois" },
-  { categorie: "Maternité — Gémellaire", actes: "Accouchement gémellaire normal",                                              taux: "80 %", plafond: "500 000 FCFA / évènement" },
-  { categorie: "Maternité — Chirurgical",actes: "Accouchement par voie chirurgicale ou avec complications",                    taux: "80 %", plafond: "600 000 FCFA / évènement" },
-  { categorie: "Transport terrestre",    actes: "Transport par voie terrestre",                                                 taux: "80 %", plafond: "100 000 FCFA / évènement" },
-];
+export function getGarantiesCNART(tarifs?: TarifSettings, tauxOverride?: number) {
+  const t = tarifs ?? getTarifs();
+  const taux = `${tauxOverride ?? t.tauxRemboursement} %`;
+  const fmt = (n: number) => n.toLocaleString("fr-FR");
+  return [
+    { categorie: "Honoraires médicaux",    actes: "Consultations, visites, actes de pratique médicale courante, petite chirurgie", taux, plafond: "Selon barème du Syndicat des Médecins Privés du Sénégal" },
+    { categorie: "Pharmacie",              actes: "Produits pharmaceutiques remboursés",                                           taux, plafond: "—" },
+    { categorie: "Auxiliaires médicaux",   actes: "Soins infirmiers, Kinésithérapie / Rééducation, Traitements psychiatriques",   taux, plafond: "Soumis à entente préalable" },
+    { categorie: "Analyses biologiques",   actes: "Analyses",                                                                     taux, plafond: "—" },
+    { categorie: "Imagerie médicale",      actes: "Radio, Scanner et IRM en externe",                                             taux, plafond: "—" },
+    { categorie: "Soins dentaires",        actes: "Soins et prothèses dentaires",                                                 taux, plafond: `${fmt(t.plafondDentaire)} FCFA / bénéficiaire` },
+    { categorie: "Optique",                actes: "Verres & montures",                                                            taux, plafond: `${fmt(t.plafondOptique)} FCFA / bénéficiaire · Renouvelable tous les 2 ans` },
+    { categorie: "Hospitalisation — Clinique", actes: "Frais de chambre en hospitalisation médicale et frais annexes",           taux, plafond: `${fmt(t.plafondHospitalisationJour)} FCFA / jour` },
+    { categorie: "Hospitalisation — Hôpital", actes: "Hospitalisation médicale",                                                 taux, plafond: "1ère catégorie de l'Hôpital Principal" },
+    { categorie: "Orthophonie",            actes: "Séances d'orthophonie",                                                       taux, plafond: `${fmt(t.plafondOrthophonie)} FCFA / bénéficiaire / an` },
+    { categorie: "Maternité — Simple",     actes: "Frais d'accouchement simple normal",                                          taux, plafond: `${fmt(t.plafondMaterniteSimple)} FCFA / évènement · Délai d'attente : 9 mois` },
+    { categorie: "Maternité — Gémellaire", actes: "Accouchement gémellaire normal",                                              taux, plafond: `${fmt(t.plafondMaterniteGemellaire)} FCFA / évènement` },
+    { categorie: "Maternité — Chirurgical",actes: "Accouchement par voie chirurgicale ou avec complications",                    taux, plafond: `${fmt(t.plafondMaterniteChirurgical)} FCFA / évènement` },
+    { categorie: "Transport terrestre",    actes: "Transport par voie terrestre",                                                 taux, plafond: `${fmt(t.plafondTransport)} FCFA / évènement` },
+  ];
+}
+
+/** @deprecated Use getGarantiesCNART() */
+export const GARANTIES_CNART = getGarantiesCNART();
 
 export const REAJUSTEMENT_SP = [
   { rapport: "< 25 %",        ajustement: "−15 % (réduction)" },
@@ -665,7 +673,7 @@ export default function NewFamillePage() {
                 {/* CP — saisie manuelle (%) */}
                 <div className="flex items-center justify-between px-4 py-2.5 border-t gap-4">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-medium">CP — Chargements Professionnels</span>
+                    <span className="text-sm font-medium">Coût de police</span>
                     <span className="text-[11px] text-muted-foreground">
                       Montant : {(cpEffectif * Number(formData.dureeGarantie)).toLocaleString("fr-FR")} FCFA
                     </span>
@@ -718,11 +726,11 @@ export default function NewFamillePage() {
                   <table className="w-full text-sm">
                     <thead><tr className="bg-blue-700 text-white">
                       <th className="text-left p-3">Nature des actes</th>
-                      <th className="p-3 text-center w-20">Taux</th>
+                      <th className="p-3 text-center w-28">Taux de remboursement</th>
                       <th className="text-left p-3">Plafond</th>
                     </tr></thead>
                     <tbody>
-                      {GARANTIES_CNART.map((row, i) => (
+                      {getGarantiesCNART(tarifs, tauxRemboursement > 0 ? tauxRemboursement : undefined).map((row, i) => (
                         <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                           <td className="p-3"><p className="font-semibold text-xs text-blue-700">{row.categorie}</p><p className="text-xs text-muted-foreground mt-0.5">{row.actes}</p></td>
                           <td className="p-3 text-center font-bold text-green-700">{row.taux}</td>

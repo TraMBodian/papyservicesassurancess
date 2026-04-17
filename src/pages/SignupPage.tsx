@@ -29,6 +29,7 @@ const SignupPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [cgAccepted, setCgAccepted] = useState(false);
 
   const roles: { value: UserRole; label: string; description: string; icon: React.ReactNode }[] = [
     { value: 'prestataire', label: 'Prestataire', description: 'Hôpital, clinique, pharmacie…', icon: <Stethoscope className="w-5 h-5" /> },
@@ -68,6 +69,10 @@ const SignupPage = () => {
     }
     if (!fullName.trim()) {
       toast({ title: "Erreur", description: "Le nom complet est requis", variant: "destructive" });
+      return;
+    }
+    if (!cgAccepted) {
+      toast({ title: "Conditions requises", description: "Vous devez accepter les Conditions Générales pour continuer", variant: "destructive" });
       return;
     }
 
@@ -276,10 +281,32 @@ const SignupPage = () => {
             </div>
           </div>
 
+          {/* Acceptation des conditions générales */}
+          <div className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50">
+            <input
+              id="cgAccepted"
+              type="checkbox"
+              checked={cgAccepted}
+              onChange={(e) => setCgAccepted(e.target.checked)}
+              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-blue-600 cursor-pointer flex-shrink-0"
+            />
+            <label htmlFor="cgAccepted" className="text-sm text-gray-700 cursor-pointer leading-snug">
+              J'ai lu et j'accepte les{" "}
+              <button
+                type="button"
+                onClick={() => navigate('/conditions-generales')}
+                className="text-blue-600 hover:underline font-semibold"
+              >
+                Conditions Générales d'Assurance
+              </button>{" "}
+              de Papy Services Assurances. <span className="text-red-500">*</span>
+            </label>
+          </div>
+
           <Button
             type="submit"
             className="w-full"
-            disabled={loading}
+            disabled={loading || !cgAccepted}
           >
             {loading ? "Création en cours..." : "Créer mon compte"}
           </Button>

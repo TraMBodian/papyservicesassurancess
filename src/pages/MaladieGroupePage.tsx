@@ -12,9 +12,10 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
-  GARANTIES_CNART, REAJUSTEMENT_SP,
+  getGarantiesCNART, REAJUSTEMENT_SP,
   typeFromDate, TYPE_COLORS,
 } from "./NewFamillePage";
+import { getTarifs } from "@/services/tarifService";
 import { calcDecomptePopulation, type MembrePopulation } from "./NewGroupePage";
 
 // Parse employesDetail : le backend retourne une chaîne JSON, pas un tableau
@@ -101,6 +102,7 @@ export default function MaladieGroupePage() {
   const [showGaranties, setShowGaranties] = useState(false);
   const [showReajust, setShowReajust]     = useState(false);
   const [expandedGroupe, setExpandedGroupe] = useState<number | null>(null);
+  const tarifs = getTarifs();
 
   useEffect(() => {
     DataService.getGroupes()
@@ -152,7 +154,7 @@ export default function MaladieGroupePage() {
         <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
           <div className="min-w-0">
             <h1 className="text-xl sm:text-3xl font-bold">Maladie Groupe</h1>
-            <p className="text-xs sm:text-sm text-muted-foreground">Polices entreprises — CNART · Taux 80 %</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">Polices entreprises — Papy Services Assurances · Taux 80 %</p>
           </div>
           <Button
             className="shrink-0 text-sm"
@@ -205,12 +207,12 @@ export default function MaladieGroupePage() {
                 <thead>
                   <tr className="bg-blue-700 text-white">
                     <th className="text-left p-3 font-semibold">Nature des actes accordés à tous les bénéficiaires</th>
-                    <th className="p-3 text-center font-semibold w-20">Taux</th>
+                    <th className="p-3 text-center font-semibold w-28">Taux de remboursement</th>
                     <th className="text-left p-3 font-semibold">Plafond de remboursement</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {GARANTIES_CNART.map((row, i) => (
+                  {getGarantiesCNART(tarifs).map((row, i) => (
                     <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                       <td className="p-3">
                         <p className="font-semibold text-xs text-blue-700 uppercase">{row.categorie}</p>
@@ -409,7 +411,7 @@ export default function MaladieGroupePage() {
                                 { label: `Adultes (${decompte.nb.adulte})`,        val: decompte.primeAdultes * duree,    show: decompte.nb.adulte > 0 },
                                 { label: `Personnes âgées (${decompte.nb.adulte_age})`, val: decompte.primeAdultesAge * duree, show: decompte.nb.adulte_age > 0 },
                                 { label: "Prime nette (= Population)",       val: decompte.primeNette * duree,  show: true, bold: true },
-                                { label: `CP — Chargements Professionnels (${decompte.tauxCP} %)`, val: decompte.cp * duree, show: true },
+                                { label: `Coût de police (${decompte.tauxCP} %)`, val: decompte.cp * duree, show: true },
                                 { label: `Taxes (${decompte.tauxTaxe.toFixed(1)} %)`, val: decompte.taxes * duree, show: true },
                               ].filter(r => r.show).map((row, idx) => (
                                 <div key={idx} className={`flex justify-between px-4 py-2.5 border-t ${(row as any).bold ? "bg-blue-50 font-semibold" : ""}`}>

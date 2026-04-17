@@ -40,7 +40,12 @@ export default function AdminProfilePage() {
 
   const handleTarifSave = () => {
     // Validation basique
-    const fields: (keyof TarifSettings)[] = ["primeEnfant", "primeAdulte", "primeAdulteAge", "tauxTaxe", "tauxCP"];
+    const fields: (keyof TarifSettings)[] = [
+      "primeEnfant", "primeAdulte", "primeAdulteAge", "tauxTaxe", "tauxCP", "tauxRemboursement",
+      "plafondDentaire", "plafondOptique", "plafondHospitalisationJour",
+      "plafondOrthophonie", "plafondMaterniteSimple", "plafondMaterniteGemellaire",
+      "plafondMaterniteChirurgical", "plafondTransport",
+    ];
     for (const f of fields) {
       if (isNaN(tarifDraft[f]) || tarifDraft[f] < 0) {
         toast.error("Veuillez saisir des valeurs numériques positives");
@@ -281,8 +286,9 @@ export default function AdminProfilePage() {
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
-                  { key: "tauxCP"    as const, label: "CP — Chargements Professionnels", sub: "Appliqué sur la prime nette", color: "border-orange-200 bg-orange-50" },
-                  { key: "tauxTaxe"  as const, label: "Taux de taxe",                    sub: "Appliqué sur la prime nette", color: "border-gray-200 bg-gray-50" },
+                  { key: "tauxRemboursement" as const, label: "Taux de remboursement", sub: "Appliqué sur tous les actes", color: "border-green-200 bg-green-50" },
+                  { key: "tauxCP"            as const, label: "Coût de police",        sub: "Appliqué sur la prime nette", color: "border-orange-200 bg-orange-50" },
+                  { key: "tauxTaxe"          as const, label: "Taux de taxe",          sub: "Appliqué sur la prime nette", color: "border-gray-200 bg-gray-50" },
                 ].map(({ key, label, sub, color }) => (
                   <div key={key} className={`rounded-lg border p-4 ${color}`}>
                     <Label className="text-xs font-semibold">{label}</Label>
@@ -310,14 +316,51 @@ export default function AdminProfilePage() {
               </div>
             </div>
 
+            {/* Plafonds de remboursement */}
+            <div>
+              <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+                Plafonds de remboursement (FCFA)
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {([
+                  { key: "plafondDentaire"            as const, label: "Soins dentaires",            sub: "Par bénéficiaire",      color: "border-teal-200 bg-teal-50" },
+                  { key: "plafondOptique"              as const, label: "Optique",                    sub: "Par bénéficiaire",      color: "border-cyan-200 bg-cyan-50" },
+                  { key: "plafondHospitalisationJour"  as const, label: "Hospitalisation — Clinique", sub: "Par jour",              color: "border-red-200 bg-red-50" },
+                  { key: "plafondOrthophonie"          as const, label: "Orthophonie",                sub: "Par bénéficiaire / an", color: "border-pink-200 bg-pink-50" },
+                  { key: "plafondMaterniteSimple"      as const, label: "Maternité — Simple",         sub: "Par évènement",         color: "border-rose-200 bg-rose-50" },
+                  { key: "plafondMaterniteGemellaire"  as const, label: "Maternité — Gémellaire",     sub: "Par évènement",         color: "border-fuchsia-200 bg-fuchsia-50" },
+                  { key: "plafondMaterniteChirurgical" as const, label: "Maternité — Chirurgical",    sub: "Par évènement",         color: "border-violet-200 bg-violet-50" },
+                  { key: "plafondTransport"            as const, label: "Transport terrestre",        sub: "Par évènement",         color: "border-amber-200 bg-amber-50" },
+                ] as const).map(({ key, label, sub, color }) => (
+                  <div key={key} className={`rounded-lg border p-4 ${color}`}>
+                    <Label className="text-xs font-semibold">{label}</Label>
+                    <p className="text-xs text-muted-foreground mb-2">{sub}</p>
+                    {tarifEditing ? (
+                      <Input
+                        type="number"
+                        min={0}
+                        value={tarifDraft[key]}
+                        onChange={e => setTarifDraft({ ...tarifDraft, [key]: Number(e.target.value) })}
+                        className="bg-white"
+                      />
+                    ) : (
+                      <p className="text-lg font-bold font-mono">
+                        {tarifs[key].toLocaleString("fr-FR")} <span className="text-xs font-normal">FCFA</span>
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Résumé formule */}
             <div className="rounded-lg border bg-blue-50 border-blue-200 p-4 text-sm text-blue-800">
               <p className="font-semibold mb-1">Formule de calcul appliquée</p>
               <p className="text-xs space-y-0.5">
                 Prime Nette = (Enfants × {tarifs.primeEnfant.toLocaleString("fr-FR")}) + (Adultes × {tarifs.primeAdulte.toLocaleString("fr-FR")}) + (Âgés × {tarifs.primeAdulteAge.toLocaleString("fr-FR")})<br />
-                CP = Prime Nette × {tarifs.tauxCP} %<br />
+                Coût de police = Prime Nette × {tarifs.tauxCP} %<br />
                 Taxes = Prime Nette × {tarifs.tauxTaxe} %<br />
-                <strong>Total = Prime Nette + CP + Taxes</strong>
+                <strong>Prime Totale = Prime Nette + Coût de police + Taxes</strong>
               </p>
             </div>
           </div>

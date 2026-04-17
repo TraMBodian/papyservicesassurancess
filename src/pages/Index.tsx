@@ -2,14 +2,153 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Shield, Users, FileText, Activity, ArrowRight, CheckCircle2, Menu, Phone, Mail, MapPin, Star, TrendingUp, Clock, Award, Stethoscope } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { FeatureSection } from "@/components/FeatureSection";
 import { AIChatbot } from "@/components/AIChatbot";
+
+// ─── Formulaire avis clients ─────────────────────────────────────────────────
+const LABELS = ['', 'Décevant', 'Passable', 'Bien', 'Très bien', 'Excellent'];
+function FeedbackForm() {
+  const [avis, setAvis]   = useState({ nom: '', email: '', note: 0, message: '' });
+  const [hover, setHover] = useState(0);
+  const [sent, setSent]   = useState(false);
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setAvis(p => ({ ...p, [k]: e.target.value }));
+  const active = hover || avis.note;
+  return (
+    <section className="py-24 mt-10 mx-4 relative z-[45] rounded-[50px] overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e3a8a 0%, #7c3aed 60%, #db2777 100%)' }}>
+      {/* Cercles décoratifs */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+
+      <div className="container mx-auto px-4 max-w-xl relative z-10">
+        <div className="text-center mb-10">
+          <span className="inline-block bg-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-4 uppercase tracking-widest">Témoignages</span>
+          <h2 className="text-4xl font-bold text-white mb-3">Partagez votre expérience</h2>
+          <p className="text-white/70 text-lg">Votre retour nous aide à progresser</p>
+        </div>
+
+        {sent ? (
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-12 text-center">
+            <div className="w-20 h-20 bg-green-400/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-green-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Merci beaucoup !</h3>
+            <p className="text-white/70 mb-6">Votre avis a bien été reçu.</p>
+            <button onClick={() => { setSent(false); setAvis({ nom:'', email:'', note:0, message:'' }); }}
+              className="text-sm text-white/70 hover:text-white transition-colors underline underline-offset-4">
+              Laisser un autre avis
+            </button>
+          </div>
+        ) : (
+          <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-2xl">
+            <form onSubmit={e => { e.preventDefault(); if (avis.note === 0) return; setSent(true); }} className="space-y-6">
+
+              {/* Étoiles */}
+              <div className="text-center">
+                <p className="text-white/80 text-sm mb-3">Votre note globale</p>
+                <div className="flex justify-center gap-2 mb-1">
+                  {[1,2,3,4,5].map(n => (
+                    <button key={n} type="button"
+                      onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)}
+                      onClick={() => setAvis(p => ({ ...p, note: n }))}
+                      className="transition-transform hover:scale-110">
+                      <Star className={`w-10 h-10 transition-all duration-150 ${n <= active ? 'fill-yellow-400 text-yellow-400 drop-shadow-md' : 'text-white/30'}`} />
+                    </button>
+                  ))}
+                </div>
+                <p className={`text-sm font-semibold transition-all duration-200 ${active ? 'text-yellow-300' : 'text-white/40'}`}>
+                  {active ? LABELS[active] : 'Cliquez pour noter'}
+                </p>
+              </div>
+
+              {/* Champs */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="flex items-center gap-1.5 text-white/70 text-xs mb-1.5 font-medium">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Nom *
+                  </label>
+                  <input value={avis.nom} onChange={set('nom')} placeholder="Votre nom" required
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40" />
+                </div>
+                <div>
+                  <label className="flex items-center gap-1.5 text-white/70 text-xs mb-1.5 font-medium">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    Email *
+                  </label>
+                  <input type="email" value={avis.email} onChange={set('email')} placeholder="votre@email.com" required
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40" />
+                </div>
+              </div>
+              <div>
+                <label className="flex items-center gap-1.5 text-white/70 text-xs mb-1.5 font-medium">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  Votre message *
+                </label>
+                <textarea value={avis.message} onChange={set('message')} rows={4} placeholder="Décrivez votre expérience…" required
+                  className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-white/40 resize-none" />
+              </div>
+
+              <button type="submit" disabled={avis.note === 0}
+                className="w-full bg-white text-blue-700 font-bold py-3 rounded-xl hover:bg-gray-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg">
+                <svg className="w-4 h-4 fill-yellow-400 text-yellow-400" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                Envoyer mon avis
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ─── Composant count-up ───────────────────────────────────────────────────────
+function CountUp({ to, suffix = '', decimals = 0 }: { to: number; suffix?: string; decimals?: number }) {
+  const [val, setVal] = useState(0);
+  const elRef    = useRef<HTMLSpanElement>(null);
+  const started  = useRef(false);
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started.current) {
+        started.current = true;
+        let t0: number;
+        const tick = (ts: number) => {
+          if (!t0) t0 = ts;
+          const p    = Math.min((ts - t0) / 1800, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          setVal(parseFloat((ease * to).toFixed(decimals)));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+        obs.disconnect();
+      }
+    }, { threshold: 0.5 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [to, decimals]);
+  return <span ref={elRef}>{decimals > 0 ? val.toFixed(decimals) : val}{suffix}</span>;
+}
 
 const Index = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const scrollRef  = useRef<HTMLDivElement>(null);
+  const statsRef   = useRef(null);
+  const statsInView = useInView(statsRef, { once: true, margin: "-80px" });
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handler = () => setScrolled(el.scrollTop > 60);
+    el.addEventListener('scroll', handler);
+    return () => el.removeEventListener('scroll', handler);
+  }, []);
 
   const slides = [
     {
@@ -46,26 +185,30 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#E8F4F8' }}>
+    <div ref={scrollRef} className="min-h-screen" style={{ backgroundColor: '#E8F4F8', overflowY: 'auto', height: '100vh' }}>
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 w-full bg-white/95 backdrop-blur-lg shadow-md z-[100] border-b border-blue-100 rounded-b-3xl">
-        <div className="px-6">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-3 group cursor-pointer" onClick={() => navigate('/')}>
-              <img src="/logo1.png" alt="Logo" className="w-12 h-12 object-contain group-hover:scale-110 transition-transform" />
-              <div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Papy Services</span>
-                <p className="text-xs text-gray-500 -mt-1">Assurances</p>
+      <nav className={`fixed z-[100] transition-all duration-300 ${
+        scrolled
+          ? 'top-3 left-4 right-4 bg-white/95 backdrop-blur-lg shadow-xl rounded-3xl border border-blue-100'
+          : 'top-0 left-0 right-0 bg-transparent'
+      }`}>
+        <div className="px-4 xl:px-6">
+          <div className="flex items-center justify-between h-16 xl:h-20">
+            <div className="flex items-center gap-2 group cursor-pointer shrink-0" onClick={() => navigate('/')}>
+              <img src="/logo1.png" alt="Logo" className="w-9 h-9 xl:w-12 xl:h-12 object-contain group-hover:scale-110 transition-transform" />
+              <div className="hidden sm:block">
+                <span className="text-lg xl:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Papy Services</span>
+                <p className="text-[10px] text-gray-500 -mt-0.5">Assurances</p>
               </div>
             </div>
-            
-            <div className="hidden md:flex items-center gap-1">
-              <a href="#features" className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all font-medium">Fonctionnalités</a>
-              <a href="#testimonials" className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all font-medium">Témoignages</a>
-              <a href="#contact" className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all font-medium">Contact</a>
-              <div className="w-px h-6 bg-gray-300 mx-2"></div>
-              <Button onClick={() => navigate('/login')} variant="ghost" className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium btn-ripple">Connexion</Button>
-              <Button onClick={() => navigate('/login')} className="shadow-lg hover:shadow-xl ml-2">Commencer</Button>
+
+            <div className="hidden md:flex items-center gap-0.5">
+              <a href="#features"    className={`px-3 py-1.5 rounded-lg transition-all text-sm font-medium ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Fonctionnalités</a>
+              <a href="#testimonials" className={`px-3 py-1.5 rounded-lg transition-all text-sm font-medium ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Témoignages</a>
+              <button onClick={() => navigate('/contact')} className={`px-3 py-1.5 rounded-lg transition-all text-sm font-medium ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Contact</button>
+              <div className={`w-px h-5 mx-1.5 ${scrolled ? 'bg-gray-300' : 'bg-white/40'}`}></div>
+              <button onClick={() => navigate('/login')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Connexion</button>
+              <button onClick={() => navigate('/login')} className="ml-1.5 px-4 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold rounded-xl shadow hover:opacity-90 transition-opacity whitespace-nowrap">Commencer</button>
             </div>
 
             <button className="md:hidden p-2 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -99,65 +242,68 @@ const Index = () => {
               <div className="absolute inset-0 flex items-center justify-center text-white">
                 <div className="container mx-auto px-4 text-center">
                   <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold mb-4 sm:mb-6 animate-fade-in drop-shadow-lg">{slide.title}</h1>
-                  <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 max-w-3xl mx-auto drop-shadow-md px-2">{slide.subtitle}</p>
-                  <div className="flex justify-center px-4">
-                    <Button onClick={() => navigate('/login')} className="bg-white text-blue-600 hover:bg-gray-100 text-sm sm:text-base px-5 sm:px-8 py-2.5 sm:py-3 h-auto">
-                      Démarrer maintenant <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5" />
-                    </Button>
-                  </div>
+                  <p className="text-base sm:text-xl md:text-2xl max-w-3xl mx-auto drop-shadow-md px-2">{slide.subtitle}</p>
                 </div>
               </div>
             </div>
           </div>
         ))}
-        
+
+        {/* Bouton fixe — ne bouge pas avec les slides */}
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-10">
+          <button
+            onClick={() => navigate('/login')}
+            className="flex items-center gap-2 bg-white text-blue-600 font-semibold text-sm sm:text-base px-6 sm:px-10 py-3 rounded-full shadow-xl hover:bg-gray-100 transition-colors whitespace-nowrap"
+          >
+            Démarrer maintenant <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </div>
+
         {/* Slide indicators */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => setCurrentSlide(idx)}
-              className={`w-3 h-3 rounded-full transition-all ${idx === currentSlide ? 'bg-white w-8' : 'bg-white/50'}`}
+              className={`h-2 rounded-full transition-all ${idx === currentSlide ? 'bg-white w-8' : 'bg-white/50 w-2'}`}
             />
           ))}
         </div>
       </div>
 
       {/* Stats Bar */}
-      <div className="relative z-10 bg-transparent">
-        <div className="container mx-auto px-4 -mt-20">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 rounded-3xl shadow-2xl">
+      <div className="relative z-10">
+        <div className="container mx-auto px-4 mt-8">
+          <motion.div
+            ref={statsRef}
+            initial={{ opacity: 0, y: 40 }}
+            animate={statsInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 rounded-3xl shadow-2xl"
+          >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="flex items-center justify-center mb-2">
-                <TrendingUp className="w-8 h-8" />
-              </div>
-              <div className="text-4xl font-bold mb-1">10K+</div>
-              <div className="text-blue-100">Assurés actifs</div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={statsInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1 }}>
+                <div className="flex items-center justify-center mb-2"><TrendingUp className="w-8 h-8" /></div>
+                <div className="text-4xl font-bold mb-1">{statsInView ? <CountUp to={10} suffix="K+" /> : "0"}</div>
+                <div className="text-blue-100">Assurés actifs</div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={statsInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.2 }}>
+                <div className="flex items-center justify-center mb-2"><Clock className="w-8 h-8" /></div>
+                <div className="text-4xl font-bold mb-1">24/7</div>
+                <div className="text-blue-100">Support disponible</div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={statsInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.3 }}>
+                <div className="flex items-center justify-center mb-2"><Award className="w-8 h-8" /></div>
+                <div className="text-4xl font-bold mb-1">{statsInView ? <CountUp to={99.9} suffix="%" decimals={1} /> : "0%"}</div>
+                <div className="text-blue-100">Satisfaction client</div>
+              </motion.div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={statsInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.4 }}>
+                <div className="flex items-center justify-center mb-2"><Shield className="w-8 h-8" /></div>
+                <div className="text-4xl font-bold mb-1">{statsInView ? <CountUp to={100} suffix="%" /> : "0%"}</div>
+                <div className="text-blue-100">Sécurisé</div>
+              </motion.div>
             </div>
-            <div>
-              <div className="flex items-center justify-center mb-2">
-                <Clock className="w-8 h-8" />
-              </div>
-              <div className="text-4xl font-bold mb-1">24/7</div>
-              <div className="text-blue-100">Support disponible</div>
-            </div>
-            <div>
-              <div className="flex items-center justify-center mb-2">
-                <Award className="w-8 h-8" />
-              </div>
-              <div className="text-4xl font-bold mb-1">99.9%</div>
-              <div className="text-blue-100">Satisfaction client</div>
-            </div>
-            <div>
-              <div className="flex items-center justify-center mb-2">
-                <Shield className="w-8 h-8" />
-              </div>
-              <div className="text-4xl font-bold mb-1">100%</div>
-              <div className="text-blue-100">Sécurisé</div>
-            </div>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -272,6 +418,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Formulaire avis clients */}
+      <FeedbackForm />
+
       {/* Registration CTA Section */}
       <section className="py-20 -mt-10 relative z-50 rounded-t-[50px]" style={{ backgroundColor: '#E8F4F8' }}>
         <div className="container mx-auto px-4">
@@ -354,7 +503,7 @@ const Index = () => {
       {/* Footer */}
       <footer id="contact" className="bg-gray-900 text-gray-300 py-16 relative z-50 scroll-mt-20">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
+          <div className="grid md:grid-cols-5 gap-12 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <img src="/logo1.png" alt="Logo" className="w-10 h-10 object-contain flex-shrink-0" />
@@ -374,6 +523,17 @@ const Index = () => {
             </div>
 
             <div>
+              <h3 className="text-white font-semibold mb-4">Informations légales</h3>
+              <ul className="space-y-2">
+                <li>
+                  <button onClick={() => navigate('/conditions-generales')} className="hover:text-white transition-colors text-left">
+                    Conditions Générales
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
               <h3 className="text-white font-semibold mb-4">Contact</h3>
               <ul className="space-y-3">
                 <li className="flex items-center gap-2">
@@ -387,6 +547,11 @@ const Index = () => {
                 <li className="flex items-start gap-2">
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>Rufisque Ouest, Cité Poste, Lot N°67</span>
+                </li>
+                <li className="mt-2">
+                  <button onClick={() => navigate('/contact')} className="text-blue-400 hover:text-white transition-colors text-sm font-medium">
+                    → Formulaire de contact
+                  </button>
                 </li>
               </ul>
             </div>

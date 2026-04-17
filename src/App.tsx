@@ -31,9 +31,10 @@ import NewGroupePage from "./pages/NewGroupePage";
 import MaladieFamillePage from "./pages/MaladieFamillePage";
 import NewFamillePage from "./pages/NewFamillePage";
 import AdminProfilePage from "./pages/AdminProfilePage";
+import ConditionsGeneralesPage from "./pages/ConditionsGeneralesPage";
+import ContactPage from "./pages/ContactPage";
 import UsersPage from "./pages/UsersPage";
 import StatistiquesPage from "./pages/StatistiquesPage";
-import PlaceholderPage from "./pages/PlaceholderPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,6 +74,8 @@ const App = () => (
             <Route path="/maladie-famille/new" element={<ProtectedRoute element={<NewFamillePage />} requiredRoles={['admin']} />} />
             <Route path="/maladie-groupe" element={<ProtectedRoute element={<MaladieGroupePage />} requiredRoles={['admin']} />} />
             <Route path="/maladie-groupe/new" element={<ProtectedRoute element={<NewGroupePage />} requiredRoles={['admin']} />} />
+            <Route path="/conditions-generales" element={<ConditionsGeneralesPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/prestataires" element={<ProtectedRoute element={<PrestatairesPage />} requiredRoles={['admin']} />} />
             <Route path="/prestataires/new" element={<ProtectedRoute element={<NewPrestatairePage />} requiredRoles={['admin']} />} />
 

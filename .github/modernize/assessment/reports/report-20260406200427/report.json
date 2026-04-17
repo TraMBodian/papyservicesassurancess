@@ -1,0 +1,1356 @@
+{
+  "version": "1.0.0",
+  "producer": "Java AppCAT CLI",
+  "metadata": {
+    "analysisStartTime": "2026-04-06T20:04:27.631Z",
+    "analysisEndTime": "2026-04-06T20:39:23.513Z",
+    "privacyMode": "Protected",
+    "privacyModeHelpUrl": "https://aka.ms/appmod-privacy-mode",
+    "targetIds": [
+      "azure-appservice",
+      "azure-aks",
+      "azure-container-apps"
+    ],
+    "targetDisplayNames": [
+      "Azure App Service",
+      "Azure Kubernetes Service",
+      "Azure Container Apps"
+    ],
+    "capabilities": [
+      "openjdk21"
+    ],
+    "os": [
+      "linux",
+      "windows"
+    ],
+    "id": "20260406200427",
+    "name": "Report_20260406200427",
+    "status": "completed",
+    "domains": [
+      "cloud-readiness",
+      "java-upgrade"
+    ],
+    "mode": "issue-only"
+  },
+  "summary": {
+    "totalProjects": 1,
+    "totalIssues": 7,
+    "totalIncidents": 41,
+    "totalEffort": 131,
+    "charts": {
+      "severity": {
+        "mandatory": 21,
+        "optional": 10,
+        "potential": 10,
+        "information": 0
+      },
+      "category": {
+        "containerization": 1,
+        "database-migration": 4,
+        "local-credential": 6,
+        "local-resource-access": 10,
+        "remote-communication": 20
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": ".",
+      "issues": 7,
+      "storyPoints": 131,
+      "properties": {
+        "appName": "assurance-sant-connect-main",
+        "jdkVersion": "21",
+        "frameworks": [
+          "Next",
+          "Next.js",
+          "React",
+          "Spring Boot",
+          "Spring"
+        ],
+        "languages": [
+          "TypeScript",
+          "Java"
+        ],
+        "tools": [
+          "NodeJs",
+          "Maven"
+        ]
+      },
+      "incidents": [
+        {
+          "ruleId": "azure-database-mysql-01000",
+          "incidentId": "fa3dc79f-6b93-414d-95f5-3a2289f0f8ad",
+          "location": "backend/src/main/resources/application.yml",
+          "locationKind": "File",
+          "line": 33,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 5,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-database-mysql-01000",
+          "incidentId": "e7f998ab-1a35-4827-875d-6685acbf871e",
+          "location": "",
+          "locationKind": "",
+          "targets": {
+            "azure-aks": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 5,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-database-postgresql-02000",
+          "incidentId": "60dab5f7-7811-412d-976d-186e9d4fc8a5",
+          "location": "backend/src/main/resources/application.yml",
+          "locationKind": "File",
+          "line": 52,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 5,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-database-postgresql-02000",
+          "incidentId": "5d17d72e-a25d-4d36-8360-9a8e183858c5",
+          "location": "",
+          "locationKind": "",
+          "targets": {
+            "azure-aks": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 5,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 5,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-password-01000",
+          "incidentId": "6f342c68-8df2-4cb1-9b74-5bd4d2b6e5ce",
+          "location": "backend/src/main/resources/application.yml",
+          "locationKind": "File",
+          "line": 13,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-password-01000",
+          "incidentId": "9312e737-4592-4577-a10a-e15f8f04f3ce",
+          "location": "backend/src/main/resources/application.yml",
+          "locationKind": "File",
+          "line": 35,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-password-01000",
+          "incidentId": "55ba09b9-1a1e-4a3d-b2cd-3fcc906bb1f7",
+          "location": "backend/src/main/resources/application.yml",
+          "locationKind": "File",
+          "line": 54,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-password-01000",
+          "incidentId": "126818cc-27f4-4693-ae35-722dc01261b5",
+          "location": "backend/src/main/resources/application.yml",
+          "locationKind": "File",
+          "line": 73,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-password-01000",
+          "incidentId": "6da152aa-e479-423e-b3b9-0082509c2a72",
+          "location": "backend/src/main/resources/application-dev.yml",
+          "locationKind": "File",
+          "line": 5,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "azure-password-01000",
+          "incidentId": "696abd66-a959-40d8-b180-7bfe86b7d32f",
+          "location": "backend/src/main/resources/application-dev.yml",
+          "locationKind": "File",
+          "line": 23,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "potential"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "potential"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=azure/springboot"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "75a4d010-5232-4aa0-bcf4-b3542d7fd08d",
+          "location": "backend/src/main/java/com/assurance/sante/connect/config/SecurityConfig.java",
+          "locationKind": "File",
+          "line": 41,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "4cf9a90d-514e-4a11-aa77-d78c128a458e",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/AssureController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "2a80c927-be13-4827-9691-51897a6668d5",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/AuthController.java",
+          "locationKind": "File",
+          "line": 18,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "064e3d1b-49cd-40eb-97dd-c15cabbb4cb4",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/ConsultationController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "bc4654ab-1ad4-42b2-9a14-597ff37a7c9f",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/EmailController.java",
+          "locationKind": "File",
+          "line": 13,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "34d310d5-9870-4e4d-827e-42ead6e82ca2",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PoliceController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "917348b5-0fcd-43e1-a306-70a2f32b3474",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PrescriptionController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "5496e19c-2272-42be-a715-74d22c5c727f",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PrestataireController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "c5f0faea-13cb-429e-b87a-64c68ab6ba98",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/SinistreController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "localhost-http-00001",
+          "incidentId": "b5bf649f-14b3-4cc4-b7a6-8050bc4502b3",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/UserController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "78fe3b1f-2836-4b76-b800-27b3bbe0e958",
+          "location": "backend/src/main/java/com/assurance/sante/connect/config/SecurityConfig.java",
+          "locationKind": "File",
+          "line": 41,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "f96b2ead-48fa-41d1-b24d-fffbda4401f5",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/AssureController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "2c152428-b3dd-4972-a06f-784f460c0cf1",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/AuthController.java",
+          "locationKind": "File",
+          "line": 18,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "6fae2ee6-24c8-4ca5-adbc-07f981148c31",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/ConsultationController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "2f26c533-5704-47a0-b359-c43d01cd0077",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/EmailController.java",
+          "locationKind": "File",
+          "line": 13,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "ade76881-bdd7-42de-9cf0-2a5752aed7f5",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PoliceController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "79b85a01-fb1d-4e2a-9656-6861bd0b4609",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PrescriptionController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "03cece12-b5a8-4c97-9018-479063e1eb4d",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PrestataireController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "6e603b0a-6a68-4748-a1e2-8e2433893909",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/SinistreController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "hardcoded-urls-00001",
+          "incidentId": "d62ebf71-98e8-436b-a972-10532b40b6fd",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/UserController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "optional"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "optional"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "7ffccb22-e851-4a95-bac4-f6ae489bd114",
+          "location": "backend/src/main/java/com/assurance/sante/connect/config/SecurityConfig.java",
+          "locationKind": "File",
+          "line": 41,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "863302bc-7e64-4759-9d2a-70cd4423f2aa",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/AssureController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "1789ba86-4f4a-4a0c-a4c5-deda28bf5b16",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/AuthController.java",
+          "locationKind": "File",
+          "line": 18,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "fb35716a-bfdd-4007-a232-e8e59c528126",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/ConsultationController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "1ec82ee8-6356-4ad7-bb59-e9e90f99c5ac",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PoliceController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "3bb627b7-e568-48ba-9a15-974c2e456d82",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PrescriptionController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "0d980beb-d9e3-4bd1-a524-9e26ed8b6772",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/SinistreController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "022be852-68ab-40ce-9998-f9e38ec033d4",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/UserController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "afa59f5a-c7c2-4e58-961f-c91345321b09",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/PrestataireController.java",
+          "locationKind": "File",
+          "line": 15,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "unsecure-network-protocol-00000",
+          "incidentId": "0ed5a1ef-4f22-48bf-9ae1-cd29a5b4950f",
+          "location": "backend/src/main/java/com/assurance/sante/connect/controller/EmailController.java",
+          "locationKind": "File",
+          "line": 13,
+          "column": 0,
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-appservice": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        },
+        {
+          "ruleId": "dockerfile-00000",
+          "incidentId": "383584b2-4fb0-4e5e-a00f-0bb638a33c76",
+          "location": "",
+          "locationKind": "",
+          "targets": {
+            "azure-aks": {
+              "effort": 3,
+              "severity": "mandatory"
+            },
+            "azure-container-apps": {
+              "effort": 3,
+              "severity": "mandatory"
+            }
+          },
+          "labels": [
+            "type=violation",
+            "ruleset=cloud-readiness"
+          ]
+        }
+      ]
+    }
+  ],
+  "rules": {
+    "azure-database-mysql-01000": {
+      "id": "azure-database-mysql-01000",
+      "description": "To migrate a Java application that uses a MySQL database to Azure, you can follow these recommendations:\n\n * Use a managed **Azure Database for MySQL**: For that create a managed MySQL database in Azure and choose the appropriate pricing tier based on your application's requirements for performance, storage, and availability.\n\n * **Migrate** the existing MySQL database: For that you can use the Azure Database Migration Service (DMS) to perform an online migration with minimal downtime.\n\n * Update the application's **database connection** details: Modify the Java application's configuration to point to the newly provisioned Azure Database for MySQL. Update the connection string, hostname, port, username, and password information accordingly.\n\n * Enable **monitoring and diagnostics**: Utilize Azure Monitor to gain insights into the performance and health of your Java application and the underlying MySQL database. Set up metrics, alerts, and log analytics to proactively identify and resolve issues.\n\n * Implement **security** measures: Apply security best practices to protect your Java application and the MySQL database. This includes implementing authentication and authorization mechanisms with passwordless connections and leveraging Microsoft Defender for Cloud for threat detection and vulnerability assessments.\n\n * **Backup** your data: Azure Database for MySQL provides automated backups by default. You can configure the retention period for backups based on your requirements. You can also enable geo-redundant backups, if needed, to enhance data durability and availability.",
+      "title": "MySQL database found",
+      "severity": "potential",
+      "effort": 5,
+      "links": [
+        {
+          "url": "https://learn.microsoft.com/azure/mysql",
+          "title": "Azure Database for MySQL documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/dms",
+          "title": "Azure Database Migration Service documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/azure-monitor",
+          "title": "Azure Monitor documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/defender-for-cloud",
+          "title": "Microsoft Defender for Cloud"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/mysql/single-server/concepts-backup",
+          "title": "Backup and restore in Azure Database for MySQL"
+        }
+      ],
+      "labels": [
+        "target=azure-appservice",
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "source",
+        "domain=cloud-readiness",
+        "category=database-migration",
+        "database",
+        "mysql",
+        "os=windows",
+        "os=linux"
+      ]
+    },
+    "azure-database-postgresql-02000": {
+      "id": "azure-database-postgresql-02000",
+      "description": "To migrate a Java application that uses a PostgreSQL database to Azure, you can follow these recommendations:\n\n * Use a managed **Azure Database for PostgreSQL Flexible Server**: For that create a managed PostgreSQL Flexible Server database in Azure and choose the appropriate pricing tier based on your application's requirements for performance, storage, and availability.\n\n * **Migrate** the existing PostgreSQL database: For that you can use the Azure Database Migration Service (DMS) to perform an online migration with minimal downtime.\n\n * Update the application's **database connection** details: Modify the Java application's configuration to point to the newly provisioned Azure Database for PostgreSQL. Update the connection string, hostname, port, username, and password information accordingly.\n\n * Enable **monitoring and diagnostics**: Utilize Azure Monitor to gain insights into the performance and health of your Java application and the underlying PostgreSQL database. Set up metrics, alerts, and log analytics to proactively identify and resolve issues.\n\n * Implement **security** measures: Apply security best practices to protect your Java application and the PostgreSQL database. This includes implementing authentication and authorization mechanisms with passwordless connections and leveraging Microsoft Defender for Cloud for threat detection and vulnerability assessments.\n\n * **Backup** your data: Azure Database for PostgreSQL provides automated backups by default. You can configure the retention period for backups based on your requirements. You can also enable geo-redundant backups, if needed, to enhance data durability and availability.",
+      "title": "PostgreSQL database found",
+      "severity": "potential",
+      "effort": 5,
+      "links": [
+        {
+          "url": "https://learn.microsoft.com/azure/postgresql/flexible-server",
+          "title": "Azure PostgreSQL Flexible Server documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/dms",
+          "title": "Azure Database Migration Service documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/azure-monitor",
+          "title": "Azure Monitor documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/defender-for-cloud",
+          "title": "Microsoft Defender for Cloud"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/postgresql/single-server/concepts-backup",
+          "title": "Backup and restore in Azure Database for PostgreSQL"
+        }
+      ],
+      "labels": [
+        "target=azure-appservice",
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "source",
+        "domain=cloud-readiness",
+        "category=database-migration",
+        "database",
+        "postgresql",
+        "os=windows",
+        "os=linux"
+      ]
+    },
+    "azure-password-01000": {
+      "id": "azure-password-01000",
+      "description": "Using clear passwords in property files is a security risk, as they can be easily compromised if the files are accessed by unauthorized individuals. To enhance the security of your application, it is recommended to employ secure credential management practices.\n\n * **Azure Key Vault**: Utilize Azure Key Vault to securely store and manage your application's passwords and other sensitive credentials. Azure Key Vault provides a centralized and highly secure location for storing secrets, keys, and certificates.\n\n * **Passwordless connections**: You can provide an additional layer of security and convenience for accessing resources in Azure by eliminating the need for passwords. This way you can reduce the risk of password-related vulnerabilities, such as weak passwords or password theft.",
+      "title": "Password found in configuration file",
+      "severity": "potential",
+      "effort": 3,
+      "links": [
+        {
+          "url": "https://learn.microsoft.com/azure/key-vault",
+          "title": "Azure Key Vault documentation"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/developer/intro/passwordless-overview",
+          "title": "Passwordless connections for Azure services"
+        },
+        {
+          "url": "https://learn.microsoft.com/azure/developer/java/migration/migrate-spring-boot-to-azure-container-apps#inventory-configuration-sources-and-secrets",
+          "title": "Password found in configuration file"
+        },
+        {
+          "url": "https://docs.microsoft.com/azure/developer/java/spring-framework/configure-spring-boot-starter-java-app-with-azure-key-vault",
+          "title": "Read a secret from Azure Key Vault in a Spring Boot application"
+        },
+        {
+          "url": "https://search.maven.org/artifact/com.azure.spring/azure-spring-boot-starter-keyvault-secrets",
+          "title": "Azure Spring Boot Starter for Azure Key Vault Secrets"
+        }
+      ],
+      "labels": [
+        "source",
+        "target=azure-appservice",
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "domain=cloud-readiness",
+        "category=local-credential",
+        "password",
+        "security",
+        "os=windows",
+        "os=linux"
+      ]
+    },
+    "dockerfile-00000": {
+      "id": "dockerfile-00000",
+      "description": "No Dockerfile was found in the project. This suggests the application may not yet be containerized. \nConsider creating a Dockerfile to enable container-based replatforming to Azure services such as Azure Container Apps or AKS.",
+      "title": "No Dockerfile found",
+      "severity": "mandatory",
+      "effort": 3,
+      "links": [
+        {
+          "url": "https://www.baeldung.com/java-dockerize-app",
+          "title": "Dockerizing a Java Application"
+        }
+      ],
+      "labels": [
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "capability=containerization",
+        "source",
+        "domain=cloud-readiness",
+        "category=containerization",
+        "containerization",
+        "os=windows",
+        "os=linux"
+      ]
+    },
+    "hardcoded-urls-00001": {
+      "id": "hardcoded-urls-00001",
+      "description": "This patterns verifies in source code and configuration files the presence of hardcoded URLs using the HTTP protocol (HTTP/HTTPS). This URL would need to be replaced by the new resource's URL during the Cloud migration, if any change occured.",
+      "title": "Avoid using hardcoded URLs (HTTP protocol) in source code",
+      "severity": "optional",
+      "effort": 3,
+      "labels": [
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "target=azure-appservice",
+        "source",
+        "domain=cloud-readiness",
+        "category=remote-communication",
+        "os=windows",
+        "os=linux"
+      ]
+    },
+    "localhost-http-00001": {
+      "id": "localhost-http-00001",
+      "description": "The app is trying to access local resource by HTTP, please try to migrate the resource to cloud",
+      "title": "Local HTTP Calls",
+      "severity": "mandatory",
+      "effort": 3,
+      "labels": [
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "target=azure-appservice",
+        "capability=containerization",
+        "source",
+        "domain=cloud-readiness",
+        "category=local-resource-access",
+        "localhost",
+        "containerization",
+        "os=windows",
+        "os=linux"
+      ]
+    },
+    "unsecure-network-protocol-00000": {
+      "id": "unsecure-network-protocol-00000",
+      "description": "Using secured protocols such as HTTPS and SFTP (over HTTP and FTP) should now be the norm as applications are more and more exposed and interconnected. \nThis CloudReady patterns looks for unescured URI in the source code or deprecated URI libraries. \nIdeally, URLs should be replaced in your source code by secured protocols HTTPS and SFTP (and ensure the infrastructure implements these protocols for the resources your application calls, uses or references).",
+      "title": "Use of unsecured network protocols or URI libraries",
+      "severity": "mandatory",
+      "effort": 3,
+      "links": [
+        {
+          "url": "https://developers.google.com/web/fundamentals/security/encrypt-in-transit/why-https",
+          "title": "Why HTTPS matters"
+        },
+        {
+          "url": "https://www.ssh.com/ssh/sftp/",
+          "title": "SSH File Transfer Protocol (SFTP): Get SFTP client & server"
+        }
+      ],
+      "labels": [
+        "target=azure-aks",
+        "target=azure-container-apps",
+        "target=azure-appservice",
+        "capability=containerization",
+        "source",
+        "domain=cloud-readiness",
+        "category=remote-communication",
+        "containerization",
+        "os=windows",
+        "os=linux"
+      ]
+    }
+  },
+  "security": []
+}

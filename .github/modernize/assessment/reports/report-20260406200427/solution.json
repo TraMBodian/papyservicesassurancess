@@ -1,0 +1,4 @@
+{
+  "azure-database-mysql-01000": "mi-mysql",
+  "azure-database-postgresql-02000": "mi-postgresql"
+}

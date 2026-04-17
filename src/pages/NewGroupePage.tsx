@@ -23,7 +23,7 @@ import { toast } from "sonner";
 import { DataService } from "@/services/dataService";
 import * as XLSX from "xlsx";
 import {
-  GARANTIES_CNART, REAJUSTEMENT_SP,
+  getGarantiesCNART, REAJUSTEMENT_SP,
   type TypeAssure, typeFromDate,
   TYPE_COLORS,
 } from "./NewFamillePage";
@@ -1059,7 +1059,7 @@ export default function NewGroupePage() {
         {/* CP — taux saisi par l'admin */}
         <div className="flex items-center justify-between px-4 py-2.5 border-t gap-4">
           <div className="flex flex-col gap-0.5">
-            <span className="text-sm font-medium">CP — Chargements Professionnels</span>
+            <span className="text-sm font-medium">Coût de police</span>
             <span className="text-[11px] text-muted-foreground">
               Montant : {(cpEffectif * duree).toLocaleString("fr-FR")} FCFA
             </span>
@@ -1473,11 +1473,11 @@ export default function NewGroupePage() {
                   <table className="w-full text-sm">
                     <thead><tr className="bg-blue-700 text-white">
                       <th className="text-left p-3 font-semibold">Nature des actes</th>
-                      <th className="p-3 text-center font-semibold w-24">Taux</th>
+                      <th className="p-3 text-center font-semibold w-28">Taux de remboursement</th>
                       <th className="text-left p-3 font-semibold">Plafond</th>
                     </tr></thead>
                     <tbody>
-                      {GARANTIES_CNART.map((row, i) => (
+                      {getGarantiesCNART(tarifs).map((row, i) => (
                         <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
                           <td className="p-3"><p className="font-semibold text-xs text-blue-700">{row.categorie}</p><p className="text-xs text-muted-foreground mt-0.5">{row.actes}</p></td>
                           <td className="p-3 text-center font-bold text-green-700">{tauxRemboursement} %</td>
