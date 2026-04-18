@@ -289,8 +289,10 @@ export default function MaladieGroupePage() {
         <div className="grid gap-6">
           {filtered.map((groupe, gi) => {
             const membres  = toMembres(groupe);
-            const decompte = calcDecomptePopulation(membres);
-            const duree    = Number(groupe.dureeGarantie || 1);
+            const decompte     = calcDecomptePopulation(membres);
+            const duree        = Number(groupe.dureeGarantie || 1);
+            const cpDisplay    = Number(groupe.cp) || decompte.cp;
+            const taxesDisplay = Math.round((decompte.primeNette + cpDisplay) * decompte.tauxTaxe / 100);
             const echeance = echeanceGroupe(groupe);
             const soon     = isExpiringSoon(groupe);
             const isOpen   = expandedGroupe === groupe.id;
@@ -410,9 +412,9 @@ export default function MaladieGroupePage() {
                                 { label: `Enfants (${decompte.nb.enfant})`,       val: decompte.primeEnfants * duree,    show: decompte.nb.enfant > 0 },
                                 { label: `Adultes (${decompte.nb.adulte})`,        val: decompte.primeAdultes * duree,    show: decompte.nb.adulte > 0 },
                                 { label: `Personnes âgées (${decompte.nb.adulte_age})`, val: decompte.primeAdultesAge * duree, show: decompte.nb.adulte_age > 0 },
-                                { label: "Prime nette (= Population)",       val: decompte.primeNette * duree,  show: true, bold: true },
-                                { label: "Coût de police", val: (Number(groupe.cp) || decompte.cp) * duree, show: true },
-                                { label: "Taxes (10 %)", val: decompte.taxes * duree, show: true },
+                                { label: "Prime Nette (Population)",       val: decompte.primeNette * duree,  show: true, bold: true },
+                                { label: "Coût de police", val: cpDisplay * duree, show: true },
+                                { label: "Taxes (10 %)", val: taxesDisplay * duree, show: true },
                               ].filter(r => r.show).map((row, idx) => (
                                 <div key={idx} className={`flex justify-between px-4 py-2.5 border-t ${(row as any).bold ? "bg-blue-50 font-semibold" : ""}`}>
                                   <span>{row.label}</span>

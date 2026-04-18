@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Plus, Search, Users, UserCheck, TrendingUp, Pencil, Trash2,
-  Calendar, RefreshCw, ShieldCheck, ChevronDown, ChevronUp, FileText, Globe,
+  Calendar, RefreshCw, ShieldCheck, ChevronDown, ChevronUp, FileText,
 } from "lucide-react";
 import { PhotoAvatar } from "@/components/PhotoUpload";
 import { motion } from "framer-motion";
@@ -200,12 +200,9 @@ export default function MaladieFamillePage() {
             onClick={() => setShowConditions(!showConditions)}
             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
           >
-            <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
-              <div className="text-left">
-                <p className="font-semibold text-sm">Conditions de souscription</p>
-                <p className="text-xs text-muted-foreground">Conditions d'adhésion, documents requis, délais de carence et exclusions</p>
-              </div>
+            <div className="text-left">
+              <p className="font-semibold text-sm">Conditions de souscription</p>
+              <p className="text-xs text-muted-foreground">Conditions d'adhésion, documents requis, délais de carence et exclusions</p>
             </div>
             {showConditions ? <ChevronUp className="w-4 h-4 shrink-0" /> : <ChevronDown className="w-4 h-4 shrink-0" />}
           </button>
@@ -337,8 +334,10 @@ export default function MaladieFamillePage() {
         <div className="grid gap-4">
           {filtered.map((famille, i) => {
             const benef    = getBeneficiairesDetail(famille);
-            const decompte = calcDecompte(benef, famille.typePrincipal || "adulte");
-            const duree    = Number(famille.dureeGarantie || 1);
+            const decompte    = calcDecompte(benef, famille.typePrincipal || "adulte");
+            const duree       = Number(famille.dureeGarantie || 1);
+            const cpDisplay   = Number(famille.cp) || decompte.cp;
+            const taxesDisplay = Math.round((decompte.primeNette + cpDisplay) * decompte.tauxTaxe / 100);
             const echeance = echeanceFamille(famille);
             const soon     = isExpiringSoon(famille);
             const isOpen   = expanded === famille.id;
@@ -468,9 +467,9 @@ export default function MaladieFamillePage() {
                               { label: `Enfants (${decompte.nb.enfant})`,     val: decompte.primeEnfants    * duree, show: decompte.nb.enfant > 0 },
                               { label: `Adultes (${decompte.nb.adulte})`,     val: decompte.primeAdultes    * duree, show: decompte.nb.adulte > 0 },
                               { label: `Personnes âgées (${decompte.nb.adulte_age})`, val: decompte.primeAdultesAge * duree, show: decompte.nb.adulte_age > 0 },
-                              { label: "Prime nette (= Population)",          val: decompte.primeNette      * duree, show: true, bold: true },
-                              { label: "Coût de police", val: (Number(famille.cp) || decompte.cp) * duree, show: true },
-                              { label: "Taxes (10 %)", val: decompte.taxes * duree, show: true },
+                              { label: "Prime Nette (Population)",          val: decompte.primeNette      * duree, show: true, bold: true },
+                              { label: "Coût de police", val: cpDisplay * duree, show: true },
+                              { label: "Taxes (10 %)", val: taxesDisplay * duree, show: true },
                             ].filter(r => r.show).map((row, idx) => (
                               <div key={idx} className={`flex justify-between px-4 py-2.5 border-t ${row.bold ? "bg-blue-50 font-semibold" : ""}`}>
                                 <span>{row.label}</span>

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { notificationStore } from "@/services/notificationStore";
 
 export default function NewConsultationPage() {
   const navigate = useNavigate();
@@ -20,7 +21,12 @@ export default function NewConsultationPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Consultation créée avec succès !");
+    notificationStore.notifyConsultationCompleted({
+      assureNom:  formData.assure,
+      medecinNom: formData.medecin,
+      specialite: formData.specialite,
+      date:       formData.date,
+    });
     navigate('/consultations');
   };
 

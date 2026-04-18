@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Users, UserCog, Shield, FileText, CreditCard,
   Stethoscope, Pill, ClipboardList, ChevronDown, ChevronRight,
-  Menu, X, LogOut, Banknote, BarChart2,
+  Menu, X, LogOut, Banknote, BarChart2, Archive,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -50,6 +50,7 @@ const adminNavItems: NavItem[] = [
   { label: "Cartes",         icon: <CreditCard size={18} />,   path: "/cartes" },
   { label: "Consultations",  icon: <ClipboardList size={18} />, path: "/consultations" },
   { label: "Prescriptions",  icon: <Pill size={18} />,          path: "/prescriptions" },
+  { label: "Archives",       icon: <Archive size={18} />,       path: "/archives" },
 ];
 
 const prestataireNavItems: NavItem[] = [

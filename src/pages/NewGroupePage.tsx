@@ -73,7 +73,7 @@ export function calcDecomptePopulation(membres: MembrePopulation[], tarifs?: Tar
   const primeAdultesAge = nb.adulte_age * t.primeAdulteAge;
   const primeNette      = primeEnfants + primeAdultes + primeAdultesAge;
   const cp              = Math.round(primeNette * t.tauxCP   / 100);
-  const taxes           = Math.round(primeNette * t.tauxTaxe / 100);
+  const taxes           = Math.round((primeNette + cp) * t.tauxTaxe / 100);
   const total           = primeNette + cp + taxes;
   return { nb, primeEnfants, primeAdultes, primeAdultesAge, primeNette, cp, tauxCP: t.tauxCP, taxes, tauxTaxe: t.tauxTaxe, total };
 }
@@ -615,7 +615,7 @@ export default function NewGroupePage() {
 
   // ── UI ──
   const [editingId,       setEditingId]       = useState<number | null>(null);
-  const [showGaranties,   setShowGaranties]   = useState(false);
+  const [showGaranties,   setShowGaranties]   = useState(true);
   const [showReajust,     setShowReajust]     = useState(false);
   const [isDragging,      setIsDragging]      = useState(false);
   const [isAnalysing,     setIsAnalysing]     = useState(false);
@@ -661,7 +661,8 @@ export default function NewGroupePage() {
   const duree         = Number(formData.dureeGarantie);
   // CP effectif : taux saisi par l'admin (%), sinon taux par défaut du service
   const cpEffectif    = cpManuel !== "" && !isNaN(Number(cpManuel)) ? Number(cpManuel) : 0;
-  const totalEffectif = decompte.primeNette + cpEffectif + decompte.taxes;
+  const taxesEffectif = Math.round((decompte.primeNette + cpEffectif) * decompte.tauxTaxe / 100);
+  const totalEffectif = decompte.primeNette + cpEffectif + taxesEffectif;
   const familleGroups = useMemo(() => groupByPrincipal(membres), [membres]);
   const validationErrors = parseResult?.errors ?? [];
 
@@ -772,7 +773,7 @@ export default function NewGroupePage() {
       prime:              (totalEffectif * duree).toString(),
       primeNette:         (decompte.primeNette * duree).toString(),
       cp:                 (cpEffectif * duree).toString(),
-      taxes:              (decompte.taxes * duree).toString(),
+      taxes:              (taxesEffectif * duree).toString(),
       tauxRemboursement,
       tarifPrimeEnfant:   tarifs.primeEnfant,
       tarifPrimeAdulte:   tarifs.primeAdulte,
@@ -1045,7 +1046,7 @@ export default function NewGroupePage() {
           { label: `Enfants (${tarifs.primeEnfant.toLocaleString("fr-FR")} × ${decompte.nb.enfant})`,                value: decompte.primeEnfants,    show: decompte.nb.enfant > 0 },
           { label: `Adultes (${tarifs.primeAdulte.toLocaleString("fr-FR")} × ${decompte.nb.adulte})`,                value: decompte.primeAdultes,    show: decompte.nb.adulte > 0 },
           { label: `Personnes âgées (${tarifs.primeAdulteAge.toLocaleString("fr-FR")} × ${decompte.nb.adulte_age})`, value: decompte.primeAdultesAge, show: decompte.nb.adulte_age > 0 },
-          { label: "Prime nette (= Population)", value: decompte.primeNette, show: true, bold: true },
+          { label: "Prime Nette (Population)", value: decompte.primeNette, show: true, bold: true },
         ].filter(r => r.show).map((row, i) => (
           <div key={i} className={`flex justify-between items-center px-4 py-2.5 border-t ${(row as any).bold ? "bg-blue-50 font-semibold" : ""}`}>
             <span className="text-sm">{row.label}</span>
@@ -1080,8 +1081,8 @@ export default function NewGroupePage() {
 
         {/* Taxes */}
         <div className="flex justify-between items-center px-4 py-2.5 border-t">
-          <span className="text-sm">Taxes ({decompte.tauxTaxe.toFixed(1)} %)</span>
-          <span className="font-mono text-sm">{(decompte.taxes * duree).toLocaleString("fr-FR")} FCFA</span>
+          <span className="text-sm">Taxes (10 %)</span>
+          <span className="font-mono text-sm">{(taxesEffectif * duree).toLocaleString("fr-FR")} FCFA</span>
         </div>
 
         {/* Total recalculé */}
@@ -1265,37 +1266,6 @@ export default function NewGroupePage() {
                       />
                       <span className="text-xs text-muted-foreground shrink-0">%</span>
                     </div>
-                  </div>
-                </div>
-
-                {/* Plafonds de remboursement */}
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 mt-1">Plafonds de remboursement</p>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {([
-                      ["plafondDentaire",             "Dentaire"],
-                      ["plafondOptique",              "Optique"],
-                      ["plafondHospitalisationJour",  "Hospit./jour"],
-                      ["plafondOrthophonie",          "Orthophonie"],
-                      ["plafondMaterniteSimple",      "Maternité simple"],
-                      ["plafondMaterniteGemellaire",  "Maternité gémell."],
-                      ["plafondMaterniteChirurgical", "Maternité chir."],
-                      ["plafondTransport",            "Transport"],
-                    ] as [keyof typeof tarifs, string][]).map(([key, label]) => (
-                      <div key={key}>
-                        <Label className="text-xs">{label}</Label>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <Input
-                            type="number" min={0} step={5000}
-                            value={(tarifs[key] as number) === 0 ? "" : (tarifs[key] as number)}
-                            onChange={e => setTarifs(t => ({ ...t, [key]: e.target.value === "" ? 0 : Number(e.target.value) }))}
-                            placeholder="0"
-                            className="text-right font-mono text-sm"
-                          />
-                          <span className="text-xs text-muted-foreground shrink-0">FCFA</span>
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 </div>
 
@@ -1487,31 +1457,66 @@ export default function NewGroupePage() {
 
             {/* Garanties */}
             <Card className="p-0 overflow-hidden">
-              <button type="button" onClick={() => setShowGaranties(!showGaranties)}
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
-                <span className="font-semibold text-sm">Tableau des garanties — Prise en charge au Sénégal</span>
-                {showGaranties ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-              {showGaranties && (
-                <div className="overflow-x-auto border-t">
-                  <table className="w-full text-sm">
-                    <thead><tr className="bg-blue-700 text-white">
-                      <th className="text-left p-3 font-semibold">Nature des actes</th>
-                      <th className="p-3 text-center font-semibold w-28">Taux de remboursement</th>
-                      <th className="text-left p-3 font-semibold">Plafond</th>
-                    </tr></thead>
-                    <tbody>
-                      {getGarantiesCNART(tarifs).map((row, i) => (
-                        <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
-                          <td className="p-3"><p className="font-semibold text-xs text-blue-700">{row.categorie}</p><p className="text-xs text-muted-foreground mt-0.5">{row.actes}</p></td>
-                          <td className="p-3 text-center font-bold text-green-700">{tauxRemboursement} %</td>
-                          <td className="p-3 text-xs text-muted-foreground">{row.plafond}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              {(() => {
+                type PlafondEntry = { key: keyof TarifSettings; suffix: string };
+                const PLAFOND_KEYS: Record<string, PlafondEntry> = {
+                  "Soins dentaires":            { key: "plafondDentaire",             suffix: "FCFA / bénéficiaire" },
+                  "Optique":                    { key: "plafondOptique",              suffix: "FCFA / bénéf. · 2 ans" },
+                  "Hospitalisation — Clinique": { key: "plafondHospitalisationJour",  suffix: "FCFA / jour" },
+                  "Orthophonie":                { key: "plafondOrthophonie",          suffix: "FCFA / bénéf. / an" },
+                  "Maternité — Simple":         { key: "plafondMaterniteSimple",      suffix: "FCFA / évènement" },
+                  "Maternité — Gémellaire":     { key: "plafondMaterniteGemellaire",  suffix: "FCFA / évènement" },
+                  "Maternité — Chirurgical":    { key: "plafondMaterniteChirurgical", suffix: "FCFA / évènement" },
+                  "Transport terrestre":        { key: "plafondTransport",            suffix: "FCFA / évènement" },
+                };
+                return (
+                  <>
+                    <button type="button" onClick={() => setShowGaranties(!showGaranties)}
+                      className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                      <span className="font-semibold text-sm">Tableau des garanties & plafonds — Prise en charge au Sénégal</span>
+                      {showGaranties ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    {showGaranties && (
+                      <div className="overflow-x-auto border-t">
+                        <table className="w-full text-sm">
+                          <thead><tr className="bg-blue-700 text-white">
+                            <th className="text-left p-3 font-semibold">Nature des actes</th>
+                            <th className="p-3 text-center font-semibold w-28">Taux de remboursement</th>
+                            <th className="text-left p-3 font-semibold">Plafond <span className="font-normal text-blue-200 text-xs">(saisable)</span></th>
+                          </tr></thead>
+                          <tbody>
+                            {getGarantiesCNART(tarifs).map((row, i) => {
+                              const plafondInfo = PLAFOND_KEYS[row.categorie];
+                              return (
+                                <tr key={i} className={`border-t ${i % 2 === 0 ? "bg-white" : "bg-gray-50"}`}>
+                                  <td className="p-3"><p className="font-semibold text-xs text-blue-700">{row.categorie}</p><p className="text-xs text-muted-foreground mt-0.5">{row.actes}</p></td>
+                                  <td className="p-3 text-center font-bold text-green-700">{tauxRemboursement} %</td>
+                                  <td className="p-3">
+                                    {plafondInfo ? (
+                                      <div className="flex items-center gap-2">
+                                        <input
+                                          type="number" min={0} step={5000}
+                                          value={(tarifs[plafondInfo.key] as number) === 0 ? "" : (tarifs[plafondInfo.key] as number)}
+                                          onChange={e => setTarifs(t => ({ ...t, [plafondInfo.key]: e.target.value === "" ? 0 : Number(e.target.value) }))}
+                                          placeholder="0"
+                                          className="w-28 text-right font-mono text-xs border rounded px-2 py-1.5 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                                        />
+                                        <span className="text-xs text-muted-foreground whitespace-nowrap">{plafondInfo.suffix}</span>
+                                      </div>
+                                    ) : (
+                                      <span className="text-xs text-muted-foreground">{row.plafond}</span>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </Card>
 
             {/* Réajustement S/P */}

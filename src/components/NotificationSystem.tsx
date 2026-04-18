@@ -1,7 +1,8 @@
-import { Bell, Check, CheckCheck, AlertTriangle, UserCheck, ClipboardList, FileText, RefreshCw, WifiOff } from "lucide-react";
+import { Bell, Check, CheckCheck, AlertTriangle, UserCheck, ClipboardList, FileText, RefreshCw, WifiOff, Pill, CreditCard } from "lucide-react";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "@/services/apiClient";
+import { notificationStore, type LocalNotification } from "@/services/notificationStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,6 +45,8 @@ const TYPE_CONFIG: Record<string, { icon: React.ReactNode; bg: string; color: st
   sinistre_recent: { icon: <FileText size={14} />,       bg: "bg-blue-100",    color: "text-blue-600"   },
   user:            { icon: <UserCheck size={14} />,      bg: "bg-purple-100",  color: "text-purple-600" },
   consultation:    { icon: <ClipboardList size={14} />,  bg: "bg-teal-100",    color: "text-teal-600"   },
+  prescription:    { icon: <Pill size={14} />,           bg: "bg-green-100",   color: "text-green-600"  },
+  paiement:        { icon: <CreditCard size={14} />,     bg: "bg-red-100",     color: "text-red-600"    },
   default:         { icon: <Bell size={14} />,           bg: "bg-gray-100",    color: "text-gray-600"   },
 };
 
@@ -58,19 +61,31 @@ export const NotificationSystem = () => {
 
   const [isOpen,           setIsOpen]           = useState(false);
   const [rawNotifications, setRawNotifications] = useState<RawNotification[]>([]);
+  const [localNotifs,      setLocalNotifs]      = useState<LocalNotification[]>(() => notificationStore.getAll());
   const [loading,          setLoading]          = useState(false);
   const [backendDown,      setBackendDown]      = useState(false);
   // readIds chargés depuis localStorage au démarrage
   const [readIds, setReadIds] = useState<Set<string>>(loadReadIds);
 
-  // ── Notifications calculées (fusion données brutes + état lu) ──────────────
-  const notifications = useMemo<Notification[]>(() =>
-    rawNotifications.map(n => ({
+  // ── Notifications calculées (fusion API + locales + état lu) ────────────────
+  const notifications = useMemo<Notification[]>(() => {
+    const apiNotifs: Notification[] = rawNotifications.map(n => ({
       ...n,
       id:   String(n.id),
       read: readIds.has(String(n.id)),
-    })),
-  [rawNotifications, readIds]);
+    }));
+    const local: Notification[] = localNotifs.map(n => ({
+      ...n,
+      read: readIds.has(n.id),
+    }));
+    // Dédoublonnage par id, locales en premier (plus récentes)
+    const seen = new Set<string>();
+    return [...local, ...apiNotifs].filter(n => {
+      if (seen.has(n.id)) return false;
+      seen.add(n.id);
+      return true;
+    });
+  }, [rawNotifications, localNotifs, readIds]);
 
   // ── Fetch indépendant de readIds — pas besoin de redémarrer le polling ──────
   const fetchNotifications = useCallback(async () => {
@@ -93,6 +108,13 @@ export const NotificationSystem = () => {
     const timer = setInterval(fetchNotifications, POLL_INTERVAL);
     return () => clearInterval(timer);
   }, [fetchNotifications]);
+
+  // Écoute les événements de notification locale (consultation, prescription…)
+  useEffect(() => {
+    const handler = () => setLocalNotifs(notificationStore.getAll());
+    window.addEventListener("cnart_notif_update", handler);
+    return () => window.removeEventListener("cnart_notif_update", handler);
+  }, []);
 
   // Fermer au clic extérieur
   useEffect(() => {

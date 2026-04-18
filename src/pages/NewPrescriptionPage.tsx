@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { notificationStore } from "@/services/notificationStore";
 import AppLayout from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -35,7 +36,12 @@ export default function NewPrescriptionPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Ordonnance créée avec succès !");
+    notificationStore.notifyPrescriptionIssued({
+      assureNom:  formData.assure,
+      medecinNom: formData.medecin,
+      nbMeds:     medicaments.filter((m) => m.nom.trim()).length,
+      date:       formData.date,
+    });
     navigate('/prescriptions');
   };
 

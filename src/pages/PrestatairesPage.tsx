@@ -26,6 +26,7 @@ const typeLabels: Record<string, string> = {
 export default function PrestatairesPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState<string | null>(null);
   const [prestataires, setPrestataires] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -39,11 +40,12 @@ export default function PrestatairesPage() {
 
   const filtered = prestataires.filter((p) => {
     const q = search.toLowerCase();
-    return (
+    const matchesSearch =
       (p.nom || "").toLowerCase().includes(q) ||
       (p.type || "").toLowerCase().includes(q) ||
-      (p.adresse || "").toLowerCase().includes(q)
-    );
+      (p.adresse || "").toLowerCase().includes(q);
+    const matchesType = filterType ? p.type === filterType : true;
+    return matchesSearch && matchesType;
   });
 
   return (
@@ -73,12 +75,31 @@ export default function PrestatairesPage() {
           </button>
         </div>
 
+        {/* ── Filtres par type ───────────────────────────────────────── */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setFilterType(null)}
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${filterType === null ? "bg-foreground text-background border-foreground" : "bg-card border-border text-muted-foreground hover:border-foreground/40"}`}
+          >
+            Tous
+          </button>
+          {Object.entries(typeLabels).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setFilterType(filterType === key ? null : key)}
+              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${filterType === key ? typeColors[key] + " border-transparent" : "bg-card border-border text-muted-foreground hover:border-foreground/40"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         {/* ── Compteur ───────────────────────────────────────────────── */}
         {!loading && !error && (
           <p className="text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">{filtered.length}</span>{" "}
             prestataire{filtered.length !== 1 ? "s" : ""}
-            {search ? ` trouvé${filtered.length !== 1 ? "s" : ""}` : " au total"}
+            {(search || filterType) ? ` trouvé${filtered.length !== 1 ? "s" : ""}` : " au total"}
           </p>
         )}
 
@@ -97,8 +118,8 @@ export default function PrestatairesPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-4">
             <Building2 size={40} className="text-muted-foreground opacity-30" />
-            <p className="font-semibold">{search ? "Aucun prestataire trouvé" : "Aucun prestataire enregistré"}</p>
-            {!search && (
+            <p className="font-semibold">{(search || filterType) ? "Aucun prestataire trouvé" : "Aucun prestataire enregistré"}</p>
+            {!(search || filterType) && (
               <p className="text-sm text-muted-foreground max-w-sm">
                 Les prestataires sont les hôpitaux, cliniques, pharmacies et laboratoires partenaires.
               </p>
