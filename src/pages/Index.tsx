@@ -187,13 +187,13 @@ const Index = () => {
   return (
     <div ref={scrollRef} className="min-h-screen" style={{ backgroundColor: '#E8F4F8', overflowY: 'auto', height: '100vh' }}>
       {/* Navbar */}
-      <nav className={`fixed z-[100] transition-all duration-300 ${
+      <nav className={`fixed z-[100] transition-all duration-500 top-3 left-1/2 -translate-x-1/2 ${
         scrolled
-          ? 'top-3 left-4 right-4 bg-white/95 backdrop-blur-lg shadow-xl rounded-3xl border border-blue-100'
-          : 'top-0 left-0 right-0 bg-transparent'
-      }`}>
-        <div className="px-4 xl:px-6">
-          <div className="flex items-center justify-between h-16 xl:h-20">
+          ? 'w-[min(860px,calc(100vw-2rem))] bg-white/90 backdrop-blur-xl shadow-lg border border-blue-100/80'
+          : 'w-[min(860px,calc(100vw-2rem))] bg-white/15 backdrop-blur-md border border-white/30'
+      } rounded-2xl`}>
+        <div className="px-4 xl:px-5">
+          <div className="flex items-center justify-between h-12">
             <div className="flex items-center gap-2 group cursor-pointer shrink-0" onClick={() => navigate('/')}>
               <img src="/logo1.png" alt="Logo" className="w-9 h-9 xl:w-12 xl:h-12 object-contain group-hover:scale-110 transition-transform" />
               <div className="hidden sm:block">
