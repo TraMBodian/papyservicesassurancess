@@ -48,12 +48,7 @@ export default function CartesPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const gradient = ctx.createLinearGradient(0, 0, 1000, 630);
-    gradient.addColorStop(0, "#1e3a8a");
-    gradient.addColorStop(0.3, "#3b82f6");
-    gradient.addColorStop(0.7, "#8b5cf6");
-    gradient.addColorStop(1, "#ec4899");
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = "#2563eb";
     ctx.fillRect(0, 0, 1000, 630);
 
     ctx.globalAlpha = 0.1;
@@ -190,7 +185,7 @@ export default function CartesPage() {
               <Card className="overflow-hidden hover:shadow-xl transition-shadow">
 
                 {/* ── Face de la carte ───────────────────────────────── */}
-                <div className="relative h-44 sm:h-48 bg-gradient-to-br from-blue-700 via-purple-600 to-pink-600 p-4 sm:p-5 text-white overflow-hidden">
+                <div className="relative h-44 sm:h-48 bg-blue-600 p-4 sm:p-5 text-white overflow-hidden">
 
                   {/* Cercles décoratifs */}
                   <div className="absolute -top-6 -right-6 w-28 h-28 bg-white/10 rounded-full" />
