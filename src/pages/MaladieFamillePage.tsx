@@ -558,7 +558,7 @@ export default function MaladieFamillePage() {
                                 </span>
                               </div>
                             ))}
-                            <div className="flex justify-between px-4 py-3 border-t bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold">
+                            <div className="flex justify-between px-4 py-3 border-t bg-blue-600 text-white font-bold">
                               <span>TOTAL À PAYER</span>
                               <span className="font-mono">{(Number(famille.prime) > 0 ? Number(famille.prime) * duree : decompte.total * duree).toLocaleString("fr-FR")} FCFA</span>
                             </div>

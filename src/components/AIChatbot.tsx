@@ -116,7 +116,7 @@ const ChatWidget = ({ onClose, lang, setLang }: {
       <audio ref={audioRef} src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 flex items-center justify-between">
+      <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-sm">
             MN
@@ -192,7 +192,7 @@ const ChatWidget = ({ onClose, lang, setLang }: {
           {!isConnected && !isConnecting && (
             <button
               onClick={startConversation}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium text-sm hover:opacity-90 transition-opacity shadow-md"
+              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-full font-medium text-sm hover:opacity-90 transition-opacity shadow-md"
             >
               <Mic className="w-4 h-4" />
               {t.start}
@@ -233,7 +233,7 @@ export const AIChatbot = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-50 animate-pulse"
+          className="fixed bottom-6 right-6 w-16 h-16 bg-blue-600 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform z-50 animate-pulse"
         >
           <HeadsetIcon className="w-8 h-8 text-white" />
         </button>

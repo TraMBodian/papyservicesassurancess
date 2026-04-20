@@ -130,7 +130,7 @@ export default function AppSidebar() {
           </div>
           {(!collapsed || isMobile) && (
             <div className="min-w-0">
-              <h1 className="font-display text-base font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
+              <h1 className="font-display text-base font-bold text-blue-600 leading-tight">
                 Papy Services
               </h1>
               <p className="text-[10px] text-sidebar-muted leading-tight">Assurances</p>
@@ -160,7 +160,7 @@ export default function AppSidebar() {
                 title={collapsed && !isMobile ? item.label : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isChildActive(item.children)
-                    ? "text-white bg-gradient-to-r from-blue-600 to-purple-600"
+                    ? "text-white bg-blue-600"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 } ${collapsed && !isMobile ? 'justify-center' : ''}`}
               >
@@ -193,7 +193,7 @@ export default function AppSidebar() {
                           onClick={() => setMobileOpen(false)}
                           className={`block px-3 py-1.5 rounded-md text-sm transition-colors ${
                             isActive(child.path)
-                              ? "text-white bg-gradient-to-r from-blue-600 to-purple-600 font-medium"
+                              ? "text-white bg-blue-600 font-medium"
                               : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent"
                           }`}
                         >
@@ -213,7 +213,7 @@ export default function AppSidebar() {
               title={collapsed && !isMobile ? item.label : undefined}
               className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive(item.path)
-                  ? "text-white bg-gradient-to-r from-blue-600 to-purple-600"
+                  ? "text-white bg-blue-600"
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               } ${collapsed && !isMobile ? 'justify-center' : ''}`}
             >

@@ -140,7 +140,7 @@ export default function AssuresPage() {
           </div>
           <button
             onClick={() => navigate('/assures/new')}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium shadow-sm transition-all whitespace-nowrap"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium shadow-sm transition-all whitespace-nowrap"
           >
             <Plus size={14} /> Nouvel assuré
           </button>

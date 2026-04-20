@@ -137,36 +137,28 @@ const Index = () => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const scrollRef  = useRef<HTMLDivElement>(null);
   const statsRef   = useRef(null);
   const statsInView = useInView(statsRef, { once: true, margin: "-80px" });
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const handler = () => setScrolled(el.scrollTop > 60);
-    el.addEventListener('scroll', handler);
-    return () => el.removeEventListener('scroll', handler);
-  }, []);
 
   const slides = [
     {
       title: "Gérez vos assurances en toute simplicité",
       subtitle: "Une plateforme complète pour tous vos besoins d'assurance santé",
-      gradient: "from-blue-600 via-purple-600 to-pink-600",
+      gradient: "from-blue-900/80 to-blue-600/60",
       image: "/images/slide1.jpg"
     },
     {
       title: "Suivi en temps réel de vos sinistres",
       subtitle: "Traitez les demandes de remboursement rapidement et efficacement",
-      gradient: "from-emerald-600 via-teal-600 to-cyan-600",
+      gradient: "from-blue-900/80 to-blue-600/60",
       image: "/images/slide2.jpg"
     },
     {
       title: "Sécurité et conformité garanties",
       subtitle: "Vos données protégées selon les normes les plus strictes",
-      gradient: "from-orange-600 via-red-600 to-pink-600",
+      gradient: "from-blue-900/80 to-blue-600/60",
       image: "/images/slide3.jpg"
     }
   ];
@@ -187,28 +179,20 @@ const Index = () => {
   return (
     <div ref={scrollRef} className="min-h-screen" style={{ backgroundColor: '#E8F4F8', overflowY: 'auto', height: '100vh' }}>
       {/* Navbar */}
-      <nav className={`fixed z-[100] transition-all duration-500 top-3 left-1/2 -translate-x-1/2 ${
-        scrolled
-          ? 'w-[min(860px,calc(100vw-2rem))] bg-white/90 backdrop-blur-xl shadow-lg border border-blue-100/80'
-          : 'w-[min(860px,calc(100vw-2rem))] bg-white/15 backdrop-blur-md border border-white/30'
-      } rounded-2xl`}>
+      <nav className="fixed z-[100] top-3 left-1/2 -translate-x-1/2 w-[min(860px,calc(100vw-2rem))] bg-white/15 backdrop-blur-md border border-white/30 rounded-2xl transition-all duration-300">
         <div className="px-4 xl:px-5">
           <div className="flex items-center justify-between h-12">
-            <div className="flex items-center gap-2 group cursor-pointer shrink-0" onClick={() => navigate('/')}>
-              <img src="/logo1.png" alt="Logo" className="w-9 h-9 xl:w-12 xl:h-12 object-contain group-hover:scale-110 transition-transform" />
-              <div className="hidden sm:block">
-                <span className="text-lg xl:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Papy Services</span>
-                <p className="text-[10px] text-gray-500 -mt-0.5">Assurances</p>
-              </div>
+            <div className="flex items-center group cursor-pointer shrink-0" onClick={() => navigate('/')}>
+              <img src="/logo1.png" alt="Logo" className="h-9 w-auto object-contain group-hover:scale-105 transition-transform" />
             </div>
 
             <div className="hidden md:flex items-center gap-0.5">
-              <a href="#features"    className={`px-3 py-1.5 rounded-lg transition-all text-sm font-medium ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Fonctionnalités</a>
-              <a href="#testimonials" className={`px-3 py-1.5 rounded-lg transition-all text-sm font-medium ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Témoignages</a>
-              <button onClick={() => navigate('/contact')} className={`px-3 py-1.5 rounded-lg transition-all text-sm font-medium ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Contact</button>
-              <div className={`w-px h-5 mx-1.5 ${scrolled ? 'bg-gray-300' : 'bg-white/40'}`}></div>
-              <button onClick={() => navigate('/login')} className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${scrolled ? 'text-gray-700 hover:text-blue-600 hover:bg-blue-50' : 'text-white hover:bg-white/20'}`}>Connexion</button>
-              <button onClick={() => navigate('/login')} className="ml-1.5 px-4 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold rounded-xl shadow hover:opacity-90 transition-opacity whitespace-nowrap">Commencer</button>
+              <a href="#features"    className="px-3 py-1.5 rounded-lg transition-all text-sm font-medium text-gray-800 hover:text-blue-600 hover:bg-white/40">Fonctionnalités</a>
+              <a href="#testimonials" className="px-3 py-1.5 rounded-lg transition-all text-sm font-medium text-gray-800 hover:text-blue-600 hover:bg-white/40">Témoignages</a>
+              <button onClick={() => navigate('/contact')} className="px-3 py-1.5 rounded-lg transition-all text-sm font-medium text-gray-800 hover:text-blue-600 hover:bg-white/40">Contact</button>
+              <div className="w-px h-5 mx-1.5 bg-gray-300/60"></div>
+              <button onClick={() => navigate('/login')} className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all text-gray-800 hover:text-blue-600 hover:bg-white/40">Connexion</button>
+              <button onClick={() => navigate('/login')} className="ml-1.5 px-4 py-1.5 bg-blue-600 text-white text-sm font-semibold rounded-xl shadow hover:bg-blue-700 transition-colors whitespace-nowrap">Commencer</button>
             </div>
 
             <button className="md:hidden p-2 hover:bg-blue-50 rounded-lg transition-colors" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -279,7 +263,7 @@ const Index = () => {
             initial={{ opacity: 0, y: 40 }}
             animate={statsInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12 rounded-3xl shadow-2xl"
+            className="bg-blue-600 text-white py-12 rounded-3xl shadow-2xl"
           >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               <motion.div initial={{ opacity: 0, y: 20 }} animate={statsInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.1 }}>
@@ -395,22 +379,29 @@ const Index = () => {
       <section id="testimonials" className="py-20 -mt-10 relative z-40 rounded-t-[50px] scroll-mt-20" style={{ backgroundColor: '#F0F8FB' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Ce que disent nos clients</h2>
-            <p className="text-xl text-gray-600">Des milliers d'entreprises nous font confiance</p>
+            <span className="inline-block text-xs font-bold uppercase tracking-widest text-blue-600 mb-3">Témoignages</span>
+            <h2 className="text-4xl font-bold mb-4 text-gray-900">Ce que disent nos clients</h2>
+            <div className="w-12 h-1 bg-blue-600 rounded-full mx-auto mt-3" />
+            <p className="text-xl text-gray-500 mt-4">Des milliers d'entreprises nous font confiance</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, idx) => (
-              <Card key={idx} className="p-8 border-none shadow-lg hover:shadow-xl transition-shadow">
+              <Card key={idx} className="p-8 border-none shadow-lg hover:shadow-xl transition-shadow border-t-4 border-t-blue-600">
                 <div className="flex gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-5 h-5 fill-blue-600 text-blue-600" />
                   ))}
                 </div>
                 <p className="text-gray-700 mb-6 italic">"{testimonial.text}"</p>
-                <div>
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-gray-500">{testimonial.role}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                    {testimonial.name[0]}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  </div>
                 </div>
               </Card>
             ))}
