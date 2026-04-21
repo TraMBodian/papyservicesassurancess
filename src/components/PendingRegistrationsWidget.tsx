@@ -28,7 +28,7 @@ export const PendingRegistrationsWidget = () => {
         `${import.meta.env.VITE_API_BASE_URL}/users?status=pending&count=true`,
         {
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`,
           },
         }
       );

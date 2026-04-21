@@ -10,7 +10,7 @@ export class ApiClient {
 
   async request<T = any>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
 
     const config: RequestInit = {
       headers: {
@@ -29,7 +29,7 @@ export class ApiClient {
       clearTimeout(timeoutId);
 
       if (response.status === 401) {
-        localStorage.removeItem('auth_token');
+        sessionStorage.removeItem('auth_token');
         window.dispatchEvent(new CustomEvent('auth:expired'));
         throw new Error('Session expirée. Veuillez vous reconnecter.');
       }

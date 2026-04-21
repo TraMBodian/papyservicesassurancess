@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const handler = () => {
       setUser(null);
-      localStorage.removeItem('auth_token');
+      sessionStorage.removeItem('auth_token');
     };
     window.addEventListener('auth:expired', handler);
     return () => window.removeEventListener('auth:expired', handler);
@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('auth_token');
+        const token = sessionStorage.getItem('auth_token');
         if (!token) return;
 
         // Token local (mode sans backend)
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           organization: userData.organization,
         });
       } catch {
-        localStorage.removeItem('auth_token');
+        sessionStorage.removeItem('auth_token');
       } finally {
         setLoading(false);
       }
@@ -92,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 1. Essayer le backend
     try {
       const response = await apiClient.login({ email, password });
-      localStorage.setItem('auth_token', response.token);
+      sessionStorage.setItem('auth_token', response.token);
       setUser({
         id: String(response.user.id),
         email: response.user.email,
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fallback = FALLBACK_ACCOUNTS[email];
     if (fallback && fallback.password === password) {
       const { password: _, ...u } = fallback;
-      localStorage.setItem('auth_token', `local-token-${fallback.id}`);
+      sessionStorage.setItem('auth_token', `local-token-${fallback.id}`);
       setUser(u);
       return;
     }
@@ -119,7 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const found = saved.find((u: any) => u.email === email && u.password === password);
     if (found) {
       const { password: _, ...u } = found;
-      localStorage.setItem('auth_token', `local-token-${found.id}`);
+      sessionStorage.setItem('auth_token', `local-token-${found.id}`);
       setUser(u);
       return;
     }
@@ -137,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         telephone,
         adresse,
       });
-      localStorage.setItem('auth_token', response.token);
+      sessionStorage.setItem('auth_token', response.token);
       setUser({
         id: String(response.user.id),
         email: response.user.email,
@@ -174,12 +174,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem('registered_users', JSON.stringify(saved));
 
     const { password: _, ...u } = newUser;
-    localStorage.setItem('auth_token', `local-token-${newUser.id}`);
+    sessionStorage.setItem('auth_token', `local-token-${newUser.id}`);
     setUser(u);
   };
 
   const signOut = async () => {
-    localStorage.removeItem('auth_token');
+    sessionStorage.removeItem('auth_token');
     setUser(null);
     apiClient.logout().catch(() => {});
   };

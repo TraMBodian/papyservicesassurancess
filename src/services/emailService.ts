@@ -25,7 +25,7 @@ export const emailService = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`,
           },
           body: JSON.stringify(params),
         }
@@ -100,7 +100,7 @@ export const tempEmailService = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`,
           },
           body: JSON.stringify({
             user_id: userId,
@@ -133,7 +133,7 @@ export const tempEmailService = {
         `${import.meta.env.VITE_API_BASE_URL}/email/real-email?tempEmail=${encodeURIComponent(tempEmail)}`,
         {
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`,
           },
         }
       );
@@ -158,7 +158,7 @@ export const tempEmailService = {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            "Authorization": `Bearer ${sessionStorage.getItem("auth_token")}`,
           },
           body: JSON.stringify({
             user_id: userId,
