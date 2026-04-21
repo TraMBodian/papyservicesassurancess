@@ -609,14 +609,21 @@ export default function ConditionsGeneralesPage() {
           </div>
           {/* Boutons PDF */}
           <div data-noprint className="px-6 py-4 flex flex-wrap gap-3 border-t border-gray-100 bg-white">
-            <button onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm">
+            <a
+              href="/conditions-generales.pdf"
+              download="Conditions-Generales-Papy-Services.pdf"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm"
+            >
               <Download size={15} /> Télécharger le PDF
-            </button>
-            <button onClick={handlePrint}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors">
+            </a>
+            <a
+              href="/conditions-generales.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors"
+            >
               <Printer size={15} /> Imprimer
-            </button>
+            </a>
           </div>
         </div>
 
