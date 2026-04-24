@@ -6,6 +6,7 @@ import com.assurance.sante.connect.dto.AuthResponse;
 import com.assurance.sante.connect.dto.UserDto;
 import com.assurance.sante.connect.dto.ApiResponse;
 import com.assurance.sante.connect.service.AuthService;
+import com.assurance.sante.connect.service.ActiveSessionService;
 import com.assurance.sante.connect.security.JwtAuthenticationToken;
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final ActiveSessionService activeSessionService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
@@ -47,7 +49,10 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout() {
+    public ResponseEntity<ApiResponse<String>> logout(Authentication authentication) {
+        if (authentication instanceof JwtAuthenticationToken jwt) {
+            activeSessionService.logout(jwt.getEmail());
+        }
         return ResponseEntity.ok(ApiResponse.success("Logout successful"));
     }
 }

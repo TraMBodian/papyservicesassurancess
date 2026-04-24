@@ -10,7 +10,18 @@ import {
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import AppLayout from '@/components/AppLayout';
-import { useAuth, updateSessionActivity, type SessionEntry } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+
+interface SessionEntry {
+  id: number;
+  userId: number;
+  fullName: string;
+  email: string;
+  role: string;
+  loginTime: string;
+  lastActivity: string;
+  active: boolean;
+}
 import { apiClient } from '@/services/apiClient';
 import { DataService } from '@/services/dataService';
 
@@ -174,7 +185,7 @@ function ConnectedUsers({ sessions }: { sessions: SessionEntry[] }) {
       {sessions.length > 0 ? (
         <ul className="divide-y divide-border">
           {sessions.map((s, idx) => {
-            const initials = s.name.split(' ').map(w => w[0] ?? '').join('').toUpperCase().slice(0, 2) || '??';
+            const initials = (s.fullName || s.email || '').split(' ').map((w: string) => w[0] ?? '').join('').toUpperCase().slice(0, 2) || '??';
             return (
               <motion.li
                 key={s.userId}
@@ -191,7 +202,7 @@ function ConnectedUsers({ sessions }: { sessions: SessionEntry[] }) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-sm font-medium text-gray-900 truncate">{s.name}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{s.fullName || s.email}</p>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${ROLE_COLOR[s.role] || 'bg-gray-100 text-gray-600'}`}>
                       {ROLE_LABEL[s.role] || s.role}
                     </span>
@@ -266,7 +277,7 @@ function buildClientStats(polices: any[], sinistres: any[], prescriptions: any[]
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const { user, getActiveSessions } = useAuth();
+  const { user } = useAuth();
   const isAdmin  = user?.role === 'admin';
   const isClient = user?.role === 'client';
 
@@ -275,18 +286,22 @@ export default function Dashboard() {
   const [apiError, setApiError]       = useState(false);
   const [clientStats, setClientStats] = useState<ClientStats | null>(null);
   const [clientLoading, setClientLoading] = useState(false);
-  const [sessions, setSessions]       = useState<SessionEntry[]>([]);
+  const [sessions, setSessions] = useState<SessionEntry[]>([]);
 
-  // Mise à jour de la session active + rafraîchissement toutes les 30 s
+  // Rafraîchit la liste des sessions depuis l'API toutes les 30 s (admin uniquement)
+  const fetchSessions = useCallback(async () => {
+    if (!isAdmin) return;
+    try {
+      const data = await apiClient.request<SessionEntry[]>('/admin/active-users');
+      setSessions(Array.isArray(data) ? data : []);
+    } catch {}
+  }, [isAdmin]);
+
   useEffect(() => {
-    if (user?.id) updateSessionActivity(user.id);
-    if (isAdmin)  setSessions(getActiveSessions());
-    const interval = setInterval(() => {
-      if (user?.id) updateSessionActivity(user.id);
-      if (isAdmin)  setSessions(getActiveSessions());
-    }, 30_000);
+    fetchSessions();
+    const interval = setInterval(fetchSessions, 30_000);
     return () => clearInterval(interval);
-  }, [user?.id, isAdmin]);
+  }, [fetchSessions]);
 
   const fetchStats = useCallback(() => {
     setLoading(true);

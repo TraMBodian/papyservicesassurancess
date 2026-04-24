@@ -22,6 +22,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final LoginRateLimiter rateLimiter;
+    private final ActiveSessionService activeSessionService;
 
     public AuthResponse login(LoginRequest request) {
         rateLimiter.checkBlocked(request.getEmail());
@@ -40,6 +41,7 @@ public class AuthService {
         }
 
         rateLimiter.resetAttempts(request.getEmail());
+        activeSessionService.login(user);
 
         String token = jwtTokenProvider.generateToken(user.getEmail());
         return AuthResponse.builder()

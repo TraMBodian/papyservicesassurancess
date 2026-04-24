@@ -2,6 +2,7 @@ package com.assurance.sante.connect.config;
 
 import com.assurance.sante.connect.security.JwtAuthenticationFilter;
 import com.assurance.sante.connect.security.JwtTokenProvider;
+import com.assurance.sante.connect.service.ActiveSessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ActiveSessionService activeSessionService;
 
     @Value("${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://localhost:8080}")
     private String allowedOriginsConfig;
@@ -72,7 +74,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, activeSessionService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
