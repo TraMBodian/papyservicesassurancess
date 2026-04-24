@@ -140,7 +140,7 @@ export default function AssuresPage() {
           </div>
           <button
             onClick={() => navigate('/assures/new')}
-            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium shadow-sm transition-all whitespace-nowrap"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium shadow-sm transition-all whitespace-nowrap"
           >
             <Plus size={14} /> Nouvel assuré
           </button>
@@ -155,7 +155,7 @@ export default function AssuresPage() {
                 <button
                   key={t}
                   onClick={() => setTypeFilter(t)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${typeFilter === t ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-600 hover:border-blue-300"}`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${typeFilter === t ? "bg-brand text-white border-brand" : "bg-white border-gray-200 text-gray-600 hover:border-brand/40"}`}
                 >
                   {t === "all" ? "Tous" : typeLabel[t]}
                 </button>
@@ -167,7 +167,7 @@ export default function AssuresPage() {
                 <button
                   key={s}
                   onClick={() => setStatutFilter(s)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${statutFilter === s ? "bg-blue-600 text-white border-blue-600" : "bg-white border-gray-200 text-gray-600 hover:border-blue-300"}`}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${statutFilter === s ? "bg-brand text-white border-brand" : "bg-white border-gray-200 text-gray-600 hover:border-brand/40"}`}
                 >
                   {s === "all" ? "Tous" : s === "ACTIF" ? "Actif" : s === "SUSPENDU" ? "Suspendu" : "Résilié"}
                 </button>

@@ -46,6 +46,25 @@ const LoginPage = () => {
       setBlockedUntil(null);
       navigate('/dashboard');
     } catch (error: any) {
+      const msg: string = error?.message || "";
+      // Backend inaccessible
+      if (msg === "Failed to fetch" || msg.includes("NetworkError") || msg.includes("Délai")) {
+        toast({
+          title: "Serveur inaccessible",
+          description: "Impossible de contacter le serveur. Vérifiez que le backend est démarré (port 3001).",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Compte en attente d'approbation
+      if (msg.toLowerCase().includes("attente") || msg.toLowerCase().includes("pending") || msg.toLowerCase().includes("approv")) {
+        toast({
+          title: "Compte en attente",
+          description: "Votre compte est en cours de validation par un administrateur.",
+          variant: "destructive",
+        });
+        return;
+      }
       const newAttempts = failedAttempts + 1;
       setFailedAttempts(newAttempts);
       if (newAttempts >= 5) {
@@ -53,7 +72,7 @@ const LoginPage = () => {
         setBlockedUntil(blockTime);
         toast({ title: "Compte bloqué", description: "5 tentatives échouées. Compte bloqué pendant 5 minutes.", variant: "destructive" });
       } else {
-        toast({ title: "Erreur de connexion", description: `${error.message || "Email ou mot de passe incorrect"} (${5 - newAttempts} tentative(s) restante(s))`, variant: "destructive" });
+        toast({ title: "Erreur de connexion", description: `${msg || "Email ou mot de passe incorrect"} (${5 - newAttempts} tentative(s) restante(s))`, variant: "destructive" });
       }
     } finally {
       setLoading(false);
@@ -73,7 +92,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex">
 
       {/* ── Panneau gauche : branding ────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden bg-blue-600">
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden bg-brand">
         {/* Cercles décoratifs */}
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-white/10 rounded-full blur-2xl" />
         <div className="absolute -bottom-24 -right-16 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl" />
@@ -111,7 +130,7 @@ const LoginPage = () => {
 
         {/* Logo visible uniquement sur mobile */}
         <div className="lg:hidden flex flex-col items-center mb-8 relative z-10">
-          <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg mb-3">
+          <div className="w-16 h-16 rounded-2xl bg-brand flex items-center justify-center shadow-lg mb-3">
             <img src="/logo1.png" alt="Logo" className="w-10 h-10 object-contain" />
           </div>
           <p className="font-bold text-gray-800 text-lg tracking-tight">Papy Services Assurances</p>
@@ -182,7 +201,7 @@ const LoginPage = () => {
 
                 <Button
                   type="submit"
-                  className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                  className="w-full h-11 rounded-xl text-sm font-semibold shadow-md hover:shadow-lg transition-all bg-brand hover:bg-brand-dark"
                   disabled={loading}
                 >
                   {loading ? (
@@ -262,7 +281,7 @@ const LoginPage = () => {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-11 rounded-xl bg-blue-600 hover:bg-blue-700 text-sm font-semibold"
+                  className="w-full h-11 rounded-xl bg-brand hover:bg-brand-dark text-sm font-semibold"
                 >
                   Modifier le mot de passe
                 </Button>

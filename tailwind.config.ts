@@ -72,6 +72,11 @@ export default {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        brand: {
+          DEFAULT: "#1B5299",
+          dark:    "#164480",
+          light:   "#2563BE",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

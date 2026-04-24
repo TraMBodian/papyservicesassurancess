@@ -101,7 +101,7 @@ export default function PrestatairesPage() {
           </div>
           <button
             onClick={() => navigate("/prestataires/new")}
-            className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0"
+            className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0"
           >
             <Plus size={15} />
             <span className="hidden sm:inline">Nouveau prestataire</span>

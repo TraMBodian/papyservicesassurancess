@@ -61,7 +61,7 @@ export default function ClaudeChat({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-brand hover:bg-brand-dark text-white rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-110"
         title={title}
       >
         <MessageCircle className="w-6 h-6" />
@@ -176,7 +176,7 @@ export default function ClaudeChat({
             size="sm"
             onClick={() => send(input)}
             disabled={!input.trim() || loading}
-            className="h-7 w-7 p-0 rounded-lg bg-blue-600 hover:bg-blue-700 shrink-0"
+            className="h-7 w-7 p-0 rounded-lg bg-brand hover:bg-brand-dark shrink-0"
           >
             <Send className="w-3.5 h-3.5" />
           </Button>

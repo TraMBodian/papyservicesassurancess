@@ -5,11 +5,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, Settings, User } from "@/components/ui/Icons";
 
 export const UserMenu = () => {
@@ -38,17 +37,18 @@ export const UserMenu = () => {
   }[user.role || "client"];
 
   const roleBgColor = {
-    admin: "bg-blue-100 text-blue-700",
-    prestataire: "bg-purple-100 text-purple-700",
-    client: "bg-emerald-100 text-emerald-700",
+    admin:       "text-white",
+    prestataire: "text-white",
+    client:      "text-white",
   }[user.role || "client"];
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg hover:bg-muted/60 transition-colors outline-none">
-          <Avatar className="h-7 w-7">
-            <AvatarFallback className="bg-gradient-to-br from-blue-600 to-purple-600 text-white text-xs font-bold">
+          <Avatar className="h-8 w-8">
+            {user.photo && <AvatarImage src={user.photo} alt={user.full_name || user.email} className="object-cover" />}
+            <AvatarFallback className="bg-brand text-white text-xs font-bold">
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -56,23 +56,13 @@ export const UserMenu = () => {
             <span className="text-xs font-semibold text-gray-900 leading-tight">
               {user.full_name || user.email}
             </span>
-            <span className={`text-[10px] px-1.5 py-px rounded-full font-medium ${roleBgColor}`}>
+            <span className={`text-[10px] px-1.5 py-px rounded-full font-medium bg-brand ${roleBgColor}`}>
               {roleLabel}
             </span>
           </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col space-y-1">
-            <span className="text-sm font-semibold">{user.full_name}</span>
-            <span className="text-xs text-gray-500">{user.email}</span>
-            {user.organization && (
-              <span className="text-xs text-gray-500">{user.organization}</span>
-            )}
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>Mon profil</span>

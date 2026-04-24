@@ -12,6 +12,7 @@ export interface AuthUser {
   organization?: string;
   created_at?: string;
   updated_at?: string;
+  photo?: string;
 }
 
 interface AuthContextType {
@@ -20,10 +21,13 @@ interface AuthContextType {
   signUp: (email: string, password: string, role: UserRole, fullName: string, organization?: string, telephone?: string, adresse?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  updatePhoto: (photo: string) => void;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const PHOTO_KEY = (id: string) => `user_photo_${id}`;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -45,13 +49,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!token) return;
 
         const userData = await apiClient.getCurrentUser();
+        const uid = String(userData.id);
         setUser({
-          id: String(userData.id),
+          id: uid,
           email: userData.email,
           role: userData.role?.toLowerCase() as UserRole,
           full_name: userData.fullName,
           fullName: userData.fullName,
           organization: userData.organization,
+          photo: localStorage.getItem(PHOTO_KEY(uid)) ?? undefined,
         });
       } catch {
         sessionStorage.removeItem('auth_token');
@@ -65,13 +71,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     const response = await apiClient.login({ email, password });
     sessionStorage.setItem('auth_token', response.token);
+    const uid = String(response.user.id);
     setUser({
-      id: String(response.user.id),
+      id: uid,
       email: response.user.email,
       role: response.user.role?.toLowerCase() as UserRole,
       full_name: response.user.fullName,
       fullName: response.user.fullName,
       organization: response.user.organization,
+      photo: localStorage.getItem(PHOTO_KEY(uid)) ?? undefined,
+    });
+  };
+
+  const updatePhoto = (photo: string) => {
+    setUser(prev => {
+      if (!prev) return prev;
+      localStorage.setItem(PHOTO_KEY(prev.id), photo);
+      return { ...prev, photo };
     });
   };
 
@@ -90,13 +106,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     sessionStorage.setItem('auth_token', response.token);
+    const uid2 = String(response.user.id);
     setUser({
-      id: String(response.user.id),
+      id: uid2,
       email: response.user.email,
       role: response.user.role?.toLowerCase() as UserRole,
       full_name: response.user.fullName,
       fullName: response.user.fullName,
       organization: response.user.organization,
+      photo: localStorage.getItem(PHOTO_KEY(uid2)) ?? undefined,
     });
   };
 
@@ -106,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     apiClient.logout().catch(() => {});
   };
 
-  const value: AuthContextType = { user, loading, signUp, signIn, signOut, isAuthenticated: !!user };
+  const value: AuthContextType = { user, loading, signUp, signIn, signOut, updatePhoto, isAuthenticated: !!user };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

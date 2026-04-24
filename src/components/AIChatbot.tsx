@@ -195,7 +195,7 @@ function ChatWidget({
       <audio ref={audioRef} src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" />
 
       {/* En-tête */}
-      <div className="text-white px-4 py-3 flex items-center justify-between" style={{ background: "#1B5299" }}>
+      <div className="bg-brand text-white px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative w-9 h-9 bg-white/20 rounded-full flex items-center justify-center font-bold text-sm shrink-0">
             MN
@@ -221,9 +221,8 @@ function ChatWidget({
               key={l.code}
               onClick={() => setLang(l.code)}
               className={`flex-1 py-2 text-xs font-medium transition-colors ${
-                lang === l.code ? "text-white" : "text-gray-500 hover:bg-gray-50"
+                lang === l.code ? "bg-brand text-white" : "text-gray-500 hover:bg-gray-50"
               }`}
-              style={lang === l.code ? { background: "#1B5299" } : undefined}
             >
               {l.label}
             </button>
@@ -239,11 +238,10 @@ function ChatWidget({
           <div
             className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 ${
               isConnected
-                ? isSpeaking ? "scale-110 shadow-xl" : "shadow-md"
-                : isConnecting ? "animate-pulse opacity-70"
+                ? isSpeaking ? "bg-brand scale-110 shadow-xl" : "bg-brand shadow-md"
+                : isConnecting ? "bg-brand animate-pulse opacity-70"
                 : "bg-gray-200"
             }`}
-            style={isConnected || isConnecting ? { background: "#1B5299" } : undefined}
           >
             {isConnected
               ? <Mic className="w-9 h-9 text-white" />
@@ -256,13 +254,11 @@ function ChatWidget({
         <div className="text-center min-h-[36px] px-2">
           <p
             className={`text-sm leading-snug transition-colors ${
-              isConnected ? "font-medium" : isConnecting ? "font-medium animate-pulse" : "text-gray-500"
+              isConnecting ? "text-brand font-medium animate-pulse" :
+              isConnected && isSpeaking ? "text-brand font-medium" :
+              isConnected ? "text-green-600 font-medium" :
+              "text-gray-500"
             }`}
-            style={
-              isConnecting ? { color: "#1B5299" } :
-              isConnected && isSpeaking ? { color: "#1B5299" } :
-              undefined
-            }
           >
             {displayMessage}
           </p>
@@ -281,8 +277,7 @@ function ChatWidget({
             <button
               onClick={startConversation}
               disabled={!AGENT_ID}
-              className="flex items-center gap-2 px-6 py-2.5 disabled:bg-gray-300 text-white rounded-full font-semibold text-sm active:scale-95 transition-all shadow-md"
-              style={AGENT_ID ? { background: "#1B5299" } : undefined}
+              className="flex items-center gap-2 px-6 py-2.5 bg-brand disabled:bg-gray-300 text-white rounded-full font-semibold text-sm hover:bg-brand-dark active:scale-95 transition-all shadow-md"
             >
               <Mic className="w-4 h-4" />
               {t.start}
@@ -319,8 +314,7 @@ function ChatWidget({
             <button
               onClick={sendText}
               disabled={!textInput.trim()}
-              className="w-7 h-7 flex items-center justify-center rounded-lg disabled:bg-gray-200 text-white disabled:text-gray-400 transition-colors shrink-0"
-              style={textInput.trim() ? { background: "#1B5299" } : undefined}
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-brand disabled:bg-gray-200 text-white disabled:text-gray-400 hover:bg-brand-dark transition-colors shrink-0"
               aria-label="Envoyer"
             >
               <SendIcon className="w-3.5 h-3.5" />
@@ -354,10 +348,9 @@ export const AIChatbot = () => {
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Ouvrir l'assistant vocal"
-          className={`fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform z-50 ${
+          className={`fixed bottom-6 right-6 w-14 h-14 bg-brand hover:bg-brand-dark rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 ${
             hasAnim ? "animate-pulse" : ""
           }`}
-          style={{ background: "#1B5299" }}
         >
           <HeadsetIcon className="w-7 h-7 text-white" />
         </button>

@@ -160,7 +160,7 @@ export default function AppSidebar() {
                 title={collapsed && !isMobile ? item.label : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   isChildActive(item.children)
-                    ? "text-white bg-blue-600"
+                    ? "text-white bg-brand"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 } ${collapsed && !isMobile ? 'justify-center' : ''}`}
               >
@@ -193,7 +193,7 @@ export default function AppSidebar() {
                           onClick={() => setMobileOpen(false)}
                           className={`block px-3 py-1.5 rounded-md text-sm transition-colors ${
                             isActive(child.path)
-                              ? "text-white bg-blue-600 font-medium"
+                              ? "text-white bg-brand font-medium"
                               : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-sidebar-accent"
                           }`}
                         >
@@ -213,7 +213,7 @@ export default function AppSidebar() {
               title={collapsed && !isMobile ? item.label : undefined}
               className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 isActive(item.path)
-                  ? "text-white bg-blue-600"
+                  ? "text-white bg-brand"
                   : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               } ${collapsed && !isMobile ? 'justify-center' : ''}`}
             >
@@ -227,38 +227,15 @@ export default function AppSidebar() {
       {/* Footer - toujours visible */}
       <div className={`border-t border-sidebar-border py-3 ${collapsed && !isMobile ? 'px-2' : 'px-3'}`}>
         {!collapsed || isMobile ? (
-          <>
-            <button
-              onClick={() => navigate("/profile")}
-              className="w-full flex items-center gap-3 mb-2 hover:bg-sidebar-accent rounded-lg p-2 transition-colors"
-            >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-xs font-semibold text-white flex-shrink-0">
-                {initials}
-              </div>
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-xs font-medium text-sidebar-foreground truncate">
-                  {user?.full_name || user?.fullName || 'Utilisateur'}
-                </p>
-                <p className="text-[10px] text-sidebar-muted">{roleLabel}</p>
-              </div>
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <LogOut size={16} />
-              <span>Déconnexion</span>
-            </button>
-          </>
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+          >
+            <LogOut size={16} />
+            <span>Déconnexion</span>
+          </button>
         ) : (
-          <div className="flex flex-col items-center gap-2">
-            <button
-              onClick={() => navigate("/profile")}
-              title={user?.full_name || 'Profil'}
-              className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-xs font-semibold text-white hover:opacity-90 transition-opacity"
-            >
-              {initials}
-            </button>
+          <div className="flex flex-col items-center">
             <button
               onClick={handleSignOut}
               title="Déconnexion"

@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { User, Mail, Phone, MapPin, Lock, Camera, Settings } from "@/components/ui/Icons";
+import { User, Mail, Phone, MapPin, Lock, Settings } from "@/components/ui/Icons";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { PhotoUpload } from "@/components/PhotoUpload";
 import { getTarifs, saveTarifs, TARIF_DEFAULTS, type TarifSettings } from "@/services/tarifService";
 
 export default function AdminProfilePage() {
-  const { user } = useAuth();
+  const { user, updatePhoto } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     nom: user?.full_name?.split(' ')[1] || "Utilisateur",
@@ -23,6 +24,12 @@ export default function AdminProfilePage() {
 
   const initials = (user?.full_name || user?.email || 'U')
     .split(' ').map((w: string) => w[0] ?? '').join('').toUpperCase().slice(0, 2) || 'AD';
+  const [photo, setPhoto] = useState<string | undefined>(user?.photo);
+
+  const handlePhotoChange = (base64: string) => {
+    setPhoto(base64);
+    updatePhoto(base64);
+  };
   const [passwordData, setPasswordData] = useState({
     current: "",
     new: "",
@@ -90,14 +97,13 @@ export default function AdminProfilePage() {
 
         <Card className="p-6">
           <div className="flex items-start gap-6 mb-6">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-3xl font-bold">
-                {initials}
-              </div>
-              <button className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-200 hover:bg-gray-50">
-                <Camera className="w-4 h-4" />
-              </button>
-            </div>
+            <PhotoUpload
+              photo={photo}
+              onChange={handlePhotoChange}
+              size="lg"
+              initials={initials}
+              label="Changer la photo"
+            />
             <div className="flex-1">
               <h2 className="text-2xl font-bold">{formData.prenom} {formData.nom}</h2>
               <p className="text-muted-foreground">{formData.role}</p>

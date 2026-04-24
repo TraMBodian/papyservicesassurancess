@@ -178,7 +178,7 @@ const [form, setForm]         = useState({ nom: "", email: "", telephone: "", su
                       className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 resize-none" />
                   </div>
                   <button type="submit" disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl shadow-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
+                    className="w-full bg-brand hover:bg-brand-dark text-white font-semibold py-3 rounded-xl shadow-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                     {loading ? "Envoi en cours…" : <><Send className="w-4 h-4" />Envoyer le message</>}
                   </button>
                 </form>

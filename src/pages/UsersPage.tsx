@@ -154,7 +154,7 @@ export default function UsersPage() {
                 onClick={() => setFilter(key)}
                 className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   filter === key
-                    ? key === "PENDING" ? "bg-yellow-500 text-white" : "bg-blue-600 text-white"
+                    ? key === "PENDING" ? "bg-yellow-500 text-white" : "bg-brand text-white"
                     : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
                 }`}
               >

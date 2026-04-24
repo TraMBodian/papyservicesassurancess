@@ -28,15 +28,19 @@ export class ApiClient {
       const response = await fetch(url, { ...config, signal: controller.signal });
       clearTimeout(timeoutId);
 
-      if (response.status === 401) {
-        sessionStorage.removeItem('auth_token');
-        window.dispatchEvent(new CustomEvent('auth:expired'));
-        throw new Error('Session expirée. Veuillez vous reconnecter.');
-      }
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'Erreur réseau' }));
-        throw new Error(errorData.message || `HTTP ${response.status}`);
+        const msg = errorData.message || errorData.data || `HTTP ${response.status}`;
+
+        // 401 sur /auth/login → mauvaises credentials, on propage le message du serveur
+        // 401 sur toute autre route → session expirée
+        if (response.status === 401 && !endpoint.includes('/auth/login')) {
+          sessionStorage.removeItem('auth_token');
+          window.dispatchEvent(new CustomEvent('auth:expired'));
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+
+        throw new Error(msg);
       }
 
       const json = await response.json();

@@ -94,7 +94,7 @@ function DeclareSinistreModal({ onClose }: { onClose: () => void }) {
                   onClick={() => set("type", k)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
                     form.type === k
-                      ? "bg-blue-600 text-white border-blue-600"
+                      ? "bg-brand text-white border-brand"
                       : "bg-card border-border text-foreground hover:bg-muted"
                   }`}
                 >
@@ -285,7 +285,7 @@ export default function SinistresPage() {
               onClick={() => setTypeFilter(key)}
               className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                 typeFilter === key
-                  ? "bg-blue-600 text-white"
+                  ? "bg-brand text-white"
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >

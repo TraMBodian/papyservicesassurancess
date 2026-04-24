@@ -255,7 +255,7 @@ export default function PolicesPage() {
             <button
               onClick={() => navigate("/contact")}
               title="Contactez votre agent pour souscrire une nouvelle police"
-              className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0"
+              className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0"
             >
               <MessageCircle size={15} />
               <span>Demander une nouvelle police</span>
@@ -264,7 +264,7 @@ export default function PolicesPage() {
             /* Admin : création directe */
             <button
               onClick={() => navigate("/polices/new")}
-              className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-medium shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0"
+              className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-medium shadow-sm hover:shadow-md active:scale-95 transition-all duration-150 whitespace-nowrap shrink-0"
             >
               <Plus size={15} />
               <span>Nouvelle police</span>
@@ -280,7 +280,7 @@ export default function PolicesPage() {
               onClick={() => setFilter(key)}
               className={`px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                 filter === key
-                  ? "bg-blue-600 text-white"
+                  ? "bg-brand text-white"
                   : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
               }`}
             >
@@ -413,7 +413,7 @@ export default function PolicesPage() {
                               {statut === "ACTIVE" && (
                                 <Button
                                   size="sm" variant="outline"
-                                  className="h-8 text-xs gap-1.5 text-blue-600 border-blue-200 hover:bg-blue-50"
+                                  className="h-8 text-xs gap-1.5 text-brand border-brand/30 hover:bg-brand/5"
                                   title="Demander le renouvellement de cette police"
                                   onClick={() => navigate("/contact")}
                                 >

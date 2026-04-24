@@ -561,7 +561,7 @@ export default function ConditionsGeneralesPage() {
             {scrolled && <span className="text-xs text-gray-400 hidden sm:block mr-2">Conditions Générales v{CG_VERSION}</span>}
             <button onClick={() => navigate('/login')} className="px-3 py-1.5 rounded-lg text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all">Connexion</button>
             {!scrolled && (
-              <button onClick={() => navigate('/login')} className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white transition-colors">Commencer</button>
+              <button onClick={() => navigate('/login')} className="px-3 py-1.5 rounded-lg text-sm font-semibold bg-brand hover:bg-brand-dark text-white transition-colors">Commencer</button>
             )}
           </div>
         </div>
@@ -612,7 +612,7 @@ export default function ConditionsGeneralesPage() {
             <a
               href="/conditions-generales.pdf"
               download="Conditions-Generales-Papy-Services.pdf"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white text-sm font-semibold transition-colors shadow-sm"
             >
               <Download size={15} /> Télécharger le PDF
             </a>

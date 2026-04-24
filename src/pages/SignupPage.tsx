@@ -99,7 +99,7 @@ const SignupPage = () => {
     <div className="h-screen flex overflow-hidden">
 
       {/* ── Panneau gauche : branding ────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden bg-blue-600 shrink-0">
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden bg-brand shrink-0">
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-white/10 rounded-full blur-2xl" />
         <div className="absolute -bottom-24 -right-16 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl" />
         <div className="absolute top-1/3 right-0 w-48 h-48 bg-blue-300/10 rounded-full blur-2xl" />
@@ -132,7 +132,7 @@ const SignupPage = () => {
 
         {/* Logo mobile */}
         <div className="lg:hidden flex flex-col items-center mb-6 relative z-10 pt-8">
-          <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg mb-3">
+          <div className="w-16 h-16 rounded-2xl bg-brand flex items-center justify-center shadow-lg mb-3">
             <img src="/logo1.png" alt="Logo" className="w-10 h-10 object-contain" />
           </div>
           <p className="font-bold text-gray-800 text-lg tracking-tight">Papy Services Assurances</p>
