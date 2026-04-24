@@ -1,242 +1,206 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, Download, QrCode, CreditCard, Loader2, ServerCrash, Users } from "@/components/ui/Icons";
+import {
+  Search, Download, QrCode, Loader2, ServerCrash, Users,
+} from "@/components/ui/Icons";
 import AppLayout from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { DataService } from "@/services/dataService";
 import { useAuth } from "@/context/AuthContext";
 
-// ─── QR helper ───────────────────────────────────────────────────────────────
+// ─── QR ──────────────────────────────────────────────────────────────────────
 const qrUrl = (data: string) =>
-  `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=1B5299&margin=6`;
+  `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data)}&bgcolor=ffffff&color=1B5299&margin=4`;
 
-// ─── Chip SVG (imitation puce bancaire) ──────────────────────────────────────
-const ChipSVG = ({ className = "" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 50 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="1" y="1" width="48" height="36" rx="5" fill="#D4A017" stroke="#B8860B" strokeWidth="1.5"/>
-    <rect x="16" y="1" width="18" height="36" fill="#C49A10"/>
-    <rect x="1" y="12" width="48" height="14" fill="#C49A10"/>
-    <rect x="16" y="12" width="18" height="14" fill="#B8860B"/>
-    <rect x="18" y="14" width="14" height="10" rx="1" fill="#D4A017" stroke="#B8860B" strokeWidth="0.8"/>
-    <line x1="1" y1="12" x2="16" y2="12" stroke="#B8860B" strokeWidth="0.8"/>
-    <line x1="34" y1="12" x2="49" y2="12" stroke="#B8860B" strokeWidth="0.8"/>
-    <line x1="1" y1="26" x2="16" y2="26" stroke="#B8860B" strokeWidth="0.8"/>
-    <line x1="34" y1="26" x2="49" y2="26" stroke="#B8860B" strokeWidth="0.8"/>
-  </svg>
-);
+// ─── Puce bancaire SVG ────────────────────────────────────────────────────────
+function ChipSVG() {
+  return (
+    <svg width="44" height="34" viewBox="0 0 50 38" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+      <rect x="1" y="1" width="48" height="36" rx="5" fill="#D4A017" stroke="#B8860B" strokeWidth="1.5"/>
+      <rect x="16" y="1" width="18" height="36" fill="#C49A10"/>
+      <rect x="1" y="12" width="48" height="14" fill="#C49A10"/>
+      <rect x="16" y="12" width="18" height="14" fill="#B8860B"/>
+      <rect x="18" y="14" width="14" height="10" rx="1" fill="#D4A017" stroke="#B8860B" strokeWidth="0.8"/>
+      <line x1="1" y1="12" x2="16" y2="12" stroke="#B8860B" strokeWidth="0.8"/>
+      <line x1="34" y1="12" x2="49" y2="12" stroke="#B8860B" strokeWidth="0.8"/>
+      <line x1="1" y1="26" x2="16" y2="26" stroke="#B8860B" strokeWidth="0.8"/>
+      <line x1="34" y1="26" x2="49" y2="26" stroke="#B8860B" strokeWidth="0.8"/>
+    </svg>
+  );
+}
 
 // ─── Carte visuelle ───────────────────────────────────────────────────────────
 function InsuranceCard({ assure }: { assure: any }) {
-  const isFamille = (assure.type ?? "").toUpperCase() === "FAMILLE";
-  const isGroupe  = (assure.type ?? "").toUpperCase() === "GROUPE";
-  const beneficiaires: string[] = assure.beneficiaires ?? [];
+  const isFamille = String(assure.type ?? "").toUpperCase() === "FAMILLE";
+  const isGroupe  = String(assure.type ?? "").toUpperCase() === "GROUPE";
+  const bens: string[] = Array.isArray(assure.beneficiaires) ? assure.beneficiaires : [];
 
-  const dateValidite = assure.dateFin
-    ? new Date(assure.dateFin).toLocaleDateString("fr-FR")
-    : "31/12/2026";
+  const fmt = (d: string | null | undefined) =>
+    d ? new Date(d).toLocaleDateString("fr-FR") : "—";
 
-  const dateNaissance = assure.dateNaissance
-    ? new Date(assure.dateNaissance).toLocaleDateString("fr-FR")
-    : assure.dateNaissance ?? "—";
+  const typeLabel = isGroupe ? "GROUPE" : isFamille ? "FAMILLE" : "INDIVIDUEL";
+
+  const fields = isGroupe
+    ? [
+        { label: "Entreprise", value: assure.nom ?? "—" },
+        { label: "Secteur",    value: assure.secteur ?? "—" },
+        { label: "Employés",   value: String(assure.employes ?? "—") },
+        { label: "Assurés",    value: String(assure.assures ?? bens.length || "—") },
+      ]
+    : [
+        { label: "Sexe",       value: assure.sexe ?? "—" },
+        { label: "Né(e) le",   value: fmt(assure.dateNaissance) },
+        { label: "Téléphone",  value: assure.telephone ?? "—" },
+        { label: "Garantie",   value: assure.garantie ?? "Standard" },
+      ];
 
   return (
-    <div
-      className="relative w-full rounded-2xl overflow-hidden select-none"
-      style={{ aspectRatio: "856/540", boxShadow: "0 20px 60px rgba(27,82,153,0.35)" }}
-    >
-      {/* ── Fond blanc ─────────────────────────────────────────────── */}
-      <div className="absolute inset-0 bg-white" />
+    /* padding-bottom trick = 540/856 ≈ 63.08 % — fonctionne dans tous les navigateurs */
+    <div className="relative w-full rounded-2xl overflow-hidden select-none"
+      style={{ paddingBottom: "63%", boxShadow: "0 16px 48px rgba(27,82,153,0.30)" }}>
 
-      {/* ── Filigrane "PSA" ────────────────────────────────────────── */}
-      <div
-        className="absolute inset-0 flex items-center justify-center pointer-events-none"
-        style={{ opacity: 0.04 }}
-      >
-        <span className="text-[200px] font-black text-brand leading-none select-none">PSA</span>
-      </div>
+      {/* Couche absolue qui remplit le parent */}
+      <div className="absolute inset-0 bg-white flex flex-col">
 
-      {/* ── Bande supérieure bleue ─────────────────────────────────── */}
-      <div className="absolute top-0 left-0 right-0 h-[28%] bg-brand flex items-center px-[4%] gap-[3%]">
-        {/* Logo */}
-        <img
-          src="/logo1.png"
-          alt="PSA"
-          className="h-[65%] object-contain drop-shadow"
-          onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-        />
-        {/* Textes */}
-        <div className="flex flex-col text-white leading-tight min-w-0">
-          <span className="font-black tracking-wide" style={{ fontSize: "clamp(7px,1.8vw,14px)" }}>
-            PAPY SERVICES ASSURANCES
-          </span>
-          <span className="font-semibold opacity-90" style={{ fontSize: "clamp(5px,1.2vw,10px)" }}>
-            CARTE D'ASSURANCE SANTÉ
+        {/* ── Filigrane ──────────────────────────────────────────── */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden"
+          style={{ opacity: 0.035 }}>
+          <span className="font-black text-[#1B5299] leading-none" style={{ fontSize: "14vw" }}>PSA</span>
+        </div>
+
+        {/* ── Bande haute bleue ──────────────────────────────────── */}
+        <div className="flex items-center gap-3 px-4 py-2 shrink-0" style={{ background: "#1B5299" }}>
+          <img src="/logo1.png" alt="PSA" className="h-10 object-contain drop-shadow shrink-0"
+            onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          <div className="flex-1 min-w-0">
+            <p className="font-black text-white leading-tight text-xs sm:text-sm truncate">
+              PAPY SERVICES ASSURANCES
+            </p>
+            <p className="text-white/80 text-[10px] sm:text-xs font-medium">
+              CARTE D'ASSURANCE SANTÉ
+            </p>
+          </div>
+          <span className="text-[10px] font-bold text-white bg-white/20 rounded px-2 py-0.5 shrink-0">
+            {typeLabel}
           </span>
         </div>
-        {/* Type badge à droite */}
-        <div className="ml-auto bg-white/20 rounded px-2 py-0.5 shrink-0">
-          <span className="text-white font-bold" style={{ fontSize: "clamp(5px,1.1vw,9px)" }}>
-            {isGroupe ? "GROUPE" : isFamille ? "FAMILLE" : "INDIVIDUEL"}
+
+        {/* ── Bande or (numéro) ──────────────────────────────────── */}
+        <div className="px-4 py-1.5 shrink-0 flex items-center"
+          style={{ background: "linear-gradient(90deg,#C49A10,#F0C430,#C49A10)" }}>
+          <span className="font-black text-white tracking-widest text-xs sm:text-sm drop-shadow">
+            {assure.numero ?? "PSA-0000-0000-0000"}
           </span>
         </div>
-      </div>
 
-      {/* ── Bande numéro de carte (or/jaune) ──────────────────────── */}
-      <div
-        className="absolute left-0 right-0 flex items-center px-[4%]"
-        style={{ top: "28%", height: "12%", background: "linear-gradient(90deg, #D4A017 0%, #F0C430 50%, #D4A017 100%)" }}
-      >
-        <span
-          className="font-black tracking-[0.18em] text-white drop-shadow"
-          style={{ fontSize: "clamp(8px,1.9vw,15px)", letterSpacing: "0.12em" }}
-        >
-          {assure.numero ?? "PSA-0000-0000-0000"}
-        </span>
-      </div>
+        {/* ── Corps principal ────────────────────────────────────── */}
+        <div className="flex flex-1 min-h-0 gap-3 px-4 py-2">
 
-      {/* ── Corps de la carte ──────────────────────────────────────── */}
-      <div
-        className="absolute left-0 right-0 bottom-0 flex"
-        style={{ top: "40%", padding: "2.5% 4%" }}
-      >
-        {/* ── Colonne gauche : puce + infos ─────────────────────── */}
-        <div className="flex-1 flex flex-col justify-between min-w-0 pr-[3%]">
-          {/* Puce + nom */}
-          <div className="flex items-center gap-[3%]">
-            <ChipSVG className="shrink-0" style={{ height: "clamp(20px,5vw,38px)", width: "auto" } as any} />
-            <div className="min-w-0">
-              <div className="text-gray-400 font-medium" style={{ fontSize: "clamp(4px,0.9vw,7px)" }}>NOM / NAME</div>
-              <div className="font-black text-gray-900 truncate uppercase" style={{ fontSize: "clamp(7px,1.6vw,13px)" }}>
-                {assure.nom ?? "—"}
-              </div>
-              <div className="font-semibold text-gray-700 truncate" style={{ fontSize: "clamp(6px,1.3vw,11px)" }}>
-                {assure.prenom ?? ""}
+          {/* Colonne gauche */}
+          <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+            {/* Puce + nom */}
+            <div className="flex items-center gap-2">
+              <ChipSVG />
+              <div className="min-w-0">
+                <p className="text-[9px] text-gray-400 uppercase font-medium">Titulaire</p>
+                <p className="font-black text-gray-900 uppercase text-xs sm:text-sm leading-tight truncate">
+                  {assure.nom ?? "—"}
+                </p>
+                <p className="font-semibold text-gray-700 text-[10px] sm:text-xs truncate">
+                  {assure.prenom ?? ""}
+                </p>
               </div>
             </div>
-          </div>
 
-          {/* Grille de champs */}
-          <div className="grid grid-cols-2 gap-x-[4%] gap-y-[1%] mt-[2%]">
-            {!isGroupe && (
-              <>
-                <Field label="Sexe" value={assure.sexe ?? "—"} />
-                <Field label="Né(e) le" value={dateNaissance} />
-                <Field label="Tél" value={assure.telephone ?? "—"} />
-                <Field label="Garantie" value={assure.garantie ?? "Standard"} />
-              </>
-            )}
-            {isGroupe && (
-              <>
-                <Field label="Entreprise" value={assure.nom ?? "—"} />
-                <Field label="Secteur" value={assure.secteur ?? "—"} />
-                <Field label="Employés" value={String(assure.employes ?? "—")} />
-                <Field label="Assurés" value={String(assure.assures ?? beneficiaires.length || "—")} />
-              </>
-            )}
-            <Field label="Statut" value={assure.statut ?? "—"} highlight />
-            <Field label="Valide jusqu'au" value={dateValidite} />
-          </div>
-
-          {/* Bénéficiaires (famille) */}
-          {isFamille && beneficiaires.length > 0 && (
-            <div className="mt-[2%] border-t border-gray-100 pt-[1.5%]">
-              <div className="text-gray-400 font-medium mb-[1%]" style={{ fontSize: "clamp(4px,0.8vw,6px)" }}>
-                BÉNÉFICIAIRES
+            {/* Champs en grille */}
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 mt-1">
+              {fields.map(f => (
+                <div key={f.label}>
+                  <p className="text-[8px] text-gray-400 uppercase font-medium leading-tight">{f.label}</p>
+                  <p className="text-[10px] sm:text-xs font-semibold text-gray-800 truncate">{f.value}</p>
+                </div>
+              ))}
+              <div>
+                <p className="text-[8px] text-gray-400 uppercase font-medium leading-tight">Statut</p>
+                <p className="text-[10px] sm:text-xs font-semibold text-green-600 truncate">{assure.statut ?? "—"}</p>
               </div>
-              <div className="flex flex-wrap gap-[1%]">
-                {beneficiaires.slice(0, 4).map((b, i) => (
-                  <span
-                    key={i}
-                    className="bg-brand/10 text-brand font-semibold rounded px-[2%] py-[0.5%]"
-                    style={{ fontSize: "clamp(4px,0.85vw,7px)" }}
-                  >
-                    {b}
-                  </span>
-                ))}
-                {beneficiaires.length > 4 && (
-                  <span className="text-gray-400" style={{ fontSize: "clamp(4px,0.8vw,6px)" }}>
-                    +{beneficiaires.length - 4}
-                  </span>
-                )}
+              <div>
+                <p className="text-[8px] text-gray-400 uppercase font-medium leading-tight">Valide jusqu'au</p>
+                <p className="text-[10px] sm:text-xs font-semibold text-gray-800">
+                  {assure.dateFin ? fmt(assure.dateFin) : "31/12/2026"}
+                </p>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* ── Colonne droite : photo + QR ───────────────────────── */}
-        <div className="flex flex-col items-center gap-[4%] shrink-0" style={{ width: "22%" }}>
-          {/* Photo */}
-          <div
-            className="w-full rounded-lg overflow-hidden border-2 border-brand/30 bg-gray-100 flex items-center justify-center"
-            style={{ aspectRatio: "3/4" }}
-          >
-            {assure.photo ? (
-              <img src={assure.photo} alt="photo" className="w-full h-full object-cover" />
-            ) : (
-              <div className="flex flex-col items-center gap-1 text-gray-300">
-                <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "40%" }}>
-                  <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-                </svg>
+            {/* Bénéficiaires */}
+            {isFamille && bens.length > 0 && (
+              <div className="mt-1 pt-1 border-t border-gray-100">
+                <p className="text-[8px] text-gray-400 uppercase font-medium mb-0.5">Bénéficiaires</p>
+                <div className="flex flex-wrap gap-1">
+                  {bens.slice(0, 4).map((b, i) => (
+                    <span key={i} className="text-[9px] font-semibold px-1.5 py-0.5 rounded"
+                      style={{ background: "#1B529915", color: "#1B5299" }}>
+                      {String(b)}
+                    </span>
+                  ))}
+                  {bens.length > 4 && (
+                    <span className="text-[9px] text-gray-400">+{bens.length - 4}</span>
+                  )}
+                </div>
               </div>
             )}
           </div>
 
-          {/* QR code */}
-          <div className="w-full bg-white border border-gray-200 rounded p-[4%]">
-            <img
-              src={qrUrl(assure.numero ?? "PSA")}
-              alt="QR"
-              className="w-full"
-              crossOrigin="anonymous"
-            />
+          {/* Colonne droite : photo + QR */}
+          <div className="flex flex-col gap-2 shrink-0 w-[18%] min-w-[60px] max-w-[100px]">
+            {/* Photo */}
+            <div className="rounded-lg overflow-hidden border-2 flex items-center justify-center bg-gray-100 shrink-0"
+              style={{ borderColor: "#1B529940", aspectRatio: "3/4" }}>
+              {assure.photo
+                ? <img src={assure.photo} alt="photo" className="w-full h-full object-cover" />
+                : (
+                  <svg viewBox="0 0 24 24" fill="#CBD5E1" className="w-8 h-8">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                  </svg>
+                )
+              }
+            </div>
+            {/* QR code */}
+            <div className="rounded border border-gray-200 bg-white p-0.5 shrink-0">
+              <img src={qrUrl(assure.numero ?? "PSA")} alt="QR" className="w-full" crossOrigin="anonymous" />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Filet bas + mention ────────────────────────────────────── */}
-      <div
-        className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-[4%] bg-brand/5 border-t border-brand/10"
-        style={{ height: "6%" }}
-      >
-        <span className="text-gray-400" style={{ fontSize: "clamp(4px,0.7vw,6px)" }}>
-          Délivrée le {new Date().toLocaleDateString("fr-FR")}
-        </span>
-        <span className="text-brand font-semibold" style={{ fontSize: "clamp(4px,0.7vw,6px)" }}>
-          www.papyservicesassurances.sn
-        </span>
-        <span className="text-gray-400 italic" style={{ fontSize: "clamp(4px,0.7vw,6px)" }}>
-          Le Directeur Général
-        </span>
+        {/* ── Pied de carte ──────────────────────────────────────── */}
+        <div className="flex items-center justify-between px-4 py-1 shrink-0 border-t"
+          style={{ background: "#1B52990A", borderColor: "#1B529920" }}>
+          <span className="text-[8px] text-gray-400">
+            Délivrée le {new Date().toLocaleDateString("fr-FR")}
+          </span>
+          <span className="text-[8px] font-semibold" style={{ color: "#1B5299" }}>
+            papyservicesassurances.sn
+          </span>
+          <span className="text-[8px] text-gray-400 italic">Le Directeur Général</span>
+        </div>
+
       </div>
     </div>
   );
 }
 
-function Field({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div>
-      <div className="text-gray-400 font-medium uppercase" style={{ fontSize: "clamp(3px,0.7vw,5.5px)" }}>
-        {label}
-      </div>
-      <div
-        className={`font-semibold truncate ${highlight ? "text-green-600" : "text-gray-800"}`}
-        style={{ fontSize: "clamp(5px,1vw,8px)" }}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
-
-// ─── Canvas download ──────────────────────────────────────────────────────────
+// ─── Téléchargement canvas ────────────────────────────────────────────────────
 async function downloadCard(assure: any) {
   const W = 1000, H = 630;
   const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
 
   const BRAND = "#1B5299";
   const GOLD  = "#D4A017";
+  const bens: string[] = Array.isArray(assure.beneficiaires) ? assure.beneficiaires : [];
+
   const loadImg = (src: string): Promise<HTMLImageElement | null> =>
     new Promise(resolve => {
       const img = new Image(); img.crossOrigin = "anonymous";
@@ -245,167 +209,147 @@ async function downloadCard(assure: any) {
       img.src = src;
     });
 
-  // Fond blanc arrondi
-  ctx.fillStyle = "white";
-  ctx.beginPath(); ctx.roundRect(0, 0, W, H, 28); ctx.fill();
+  const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
 
-  // Filigrane PSA
-  ctx.save();
-  ctx.globalAlpha = 0.04;
-  ctx.fillStyle = BRAND;
-  ctx.font = "bold 260px Arial";
-  ctx.textAlign = "center";
+  // Fond blanc
+  ctx.fillStyle = "white"; roundRect(0, 0, W, H, 28); ctx.fill();
+
+  // Filigrane
+  ctx.save(); ctx.globalAlpha = 0.04;
+  ctx.fillStyle = BRAND; ctx.font = "bold 260px Arial"; ctx.textAlign = "center";
   ctx.fillText("PSA", W / 2, H / 2 + 90);
   ctx.restore();
 
-  // Bande supérieure bleue
+  // Bande bleue haute
   ctx.fillStyle = BRAND;
-  ctx.beginPath(); ctx.roundRect(0, 0, W, 176, [28, 28, 0, 0]); ctx.fill();
-  ctx.fillRect(0, 148, W, 30);
+  ctx.fillRect(0, 0, W, 160);
+  ctx.fillRect(0, 128, W, 32); // raccord arrondi bas
 
   // Logo
   const logo = await loadImg("/logo1.png");
-  if (logo) ctx.drawImage(logo, 28, 12, 115, 115);
+  if (logo) ctx.drawImage(logo, 28, 14, 110, 110);
 
-  // Titre
-  ctx.fillStyle = "white";
-  ctx.textAlign = "left";
-  ctx.font = "bold 28px Arial";
-  ctx.fillText("PAPY SERVICES ASSURANCES", 155, 65);
-  ctx.font = "18px Arial";
-  ctx.globalAlpha = 0.9;
-  ctx.fillText("CARTE D'ASSURANCE SANTÉ", 155, 92);
-  ctx.globalAlpha = 1;
+  ctx.fillStyle = "white"; ctx.textAlign = "left";
+  ctx.font = "bold 26px Arial"; ctx.fillText("PAPY SERVICES ASSURANCES", 152, 68);
+  ctx.font = "16px Arial"; ctx.globalAlpha = 0.85;
+  ctx.fillText("CARTE D'ASSURANCE SANTÉ", 152, 92); ctx.globalAlpha = 1;
 
-  // Badge type
-  const typeLabel = (assure.type ?? "").toUpperCase() === "GROUPE" ? "GROUPE"
-    : (assure.type ?? "").toUpperCase() === "FAMILLE" ? "FAMILLE" : "INDIVIDUEL";
-  ctx.fillStyle = "rgba(255,255,255,0.25)";
-  ctx.beginPath(); ctx.roundRect(W - 130, 24, 110, 30, 6); ctx.fill();
-  ctx.fillStyle = "white"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
-  ctx.fillText(typeLabel, W - 75, 43);
-  ctx.textAlign = "left";
+  const typeLabel = String(assure.type ?? "").toUpperCase() === "GROUPE" ? "GROUPE"
+    : String(assure.type ?? "").toUpperCase() === "FAMILLE" ? "FAMILLE" : "INDIVIDUEL";
+  ctx.fillStyle = "rgba(255,255,255,0.2)";
+  roundRect(W - 130, 24, 116, 28, 6); ctx.fill();
+  ctx.fillStyle = "white"; ctx.font = "bold 13px Arial"; ctx.textAlign = "center";
+  ctx.fillText(typeLabel, W - 72, 43); ctx.textAlign = "left";
 
-  // Bande or numéro
-  const grad = ctx.createLinearGradient(0, 176, W, 176);
-  grad.addColorStop(0, "#C49A10"); grad.addColorStop(0.5, "#F0C430"); grad.addColorStop(1, "#C49A10");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 176, W, 70);
-  ctx.fillStyle = "white";
-  ctx.font = "bold 30px monospace";
-  ctx.fillText(assure.numero ?? "PSA-0000-0000-0000", 38, 220);
+  // Bande or
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, "#B8860B"); grad.addColorStop(0.5, "#F0C430"); grad.addColorStop(1, "#B8860B");
+  ctx.fillStyle = grad; ctx.fillRect(0, 160, W, 60);
+  ctx.fillStyle = "white"; ctx.font = "bold 28px monospace";
+  ctx.fillText(assure.numero ?? "PSA-0000-0000-0000", 38, 200);
 
-  // ── Puce (dessin simple) ──
-  ctx.fillStyle = GOLD;
-  ctx.beginPath(); ctx.roundRect(38, 272, 62, 46, 6); ctx.fill();
+  // Puce
+  const px = 38, py = 250;
+  ctx.fillStyle = GOLD; roundRect(px, py, 60, 44, 5); ctx.fill();
   ctx.fillStyle = "#C49A10";
-  ctx.fillRect(58, 272, 22, 46);
-  ctx.fillRect(38, 288, 62, 14);
-  ctx.fillStyle = GOLD;
-  ctx.beginPath(); ctx.roundRect(60, 290, 18, 10, 2); ctx.fill();
+  ctx.fillRect(px + 16, py, 18, 44);
+  ctx.fillRect(px, py + 14, 60, 16);
+  ctx.fillStyle = GOLD; roundRect(px + 18, py + 16, 16, 10, 2); ctx.fill();
 
-  // ── Photo ──
-  const photoX = W - 185, photoY = 265, photoW = 150, photoH = 200;
-  ctx.fillStyle = "#E5E7EB";
-  ctx.beginPath(); ctx.roundRect(photoX, photoY, photoW, photoH, 8); ctx.fill();
+  // Photo
+  const photoX = W - 175, photoY = 240, photoW = 140, photoH = 187;
+  ctx.fillStyle = "#E5E7EB"; roundRect(photoX, photoY, photoW, photoH, 6); ctx.fill();
   if (assure.photo) {
     const photoImg = await loadImg(assure.photo);
     if (photoImg) {
-      ctx.save();
-      ctx.beginPath(); ctx.roundRect(photoX, photoY, photoW, photoH, 8); ctx.clip();
-      ctx.drawImage(photoImg, photoX, photoY, photoW, photoH);
-      ctx.restore();
+      ctx.save(); roundRect(photoX, photoY, photoW, photoH, 6); ctx.clip();
+      ctx.drawImage(photoImg, photoX, photoY, photoW, photoH); ctx.restore();
     }
   }
   ctx.strokeStyle = `${BRAND}55`; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.roundRect(photoX, photoY, photoW, photoH, 8); ctx.stroke();
+  roundRect(photoX, photoY, photoW, photoH, 6); ctx.stroke();
 
-  // ── Infos texte ──
-  const col1X = 38, col2X = 340;
-  const isFamille = (assure.type ?? "").toUpperCase() === "FAMILLE";
-  const isGroupe  = (assure.type ?? "").toUpperCase() === "GROUPE";
-  const rows = isGroupe ? [
-    ["Entreprise", assure.nom ?? "—"],
-    ["Secteur",    assure.secteur ?? "—"],
-    ["Employés",   String(assure.employes ?? "—")],
-    ["Assurés",    String(assure.assures ?? (assure.beneficiaires?.length ?? "—"))],
-  ] : [
-    ["Nom",        assure.nom ?? "—"],
-    ["Prénoms",    assure.prenom ?? "—"],
-    ["Sexe",       assure.sexe ?? "—"],
-    ["Né(e) le",   assure.dateNaissance ? new Date(assure.dateNaissance).toLocaleDateString("fr-FR") : "—"],
+  // Champs texte
+  const isGroupe = String(assure.type ?? "").toUpperCase() === "GROUPE";
+  const fmt = (d: string | null | undefined) =>
+    d ? new Date(d).toLocaleDateString("fr-FR") : "—";
+
+  const col1 = isGroupe
+    ? [["Entreprise", assure.nom], ["Secteur", assure.secteur ?? "—"]]
+    : [["Nom", assure.nom ?? "—"], ["Prénoms", assure.prenom ?? "—"]];
+  const col2 = isGroupe
+    ? [["Employés", String(assure.employes ?? "—")], ["Assurés", String(assure.assures ?? bens.length || "—")]]
+    : [["Sexe", assure.sexe ?? "—"], ["Né(e) le", fmt(assure.dateNaissance)]];
+  const col3 = [
+    ["Téléphone", assure.telephone ?? "—"],
+    ["Garantie",  assure.garantie ?? "Standard"],
+    ["Statut",    assure.statut ?? "—"],
+    ["Valide",    assure.dateFin ? fmt(assure.dateFin) : "31/12/2026"],
   ];
 
-  const rows2 = [
-    ["Téléphone",  assure.telephone ?? "—"],
-    ["Garantie",   assure.garantie ?? "Standard"],
-    ["Statut",     assure.statut ?? "—"],
-    ["Valide jusqu'au", assure.dateFin ? new Date(assure.dateFin).toLocaleDateString("fr-FR") : "31/12/2026"],
-  ];
-
-  let y = 285;
-  rows.slice(0, 4).forEach(([label, value]) => {
-    ctx.fillStyle = "#9CA3AF"; ctx.font = "11px Arial";
-    ctx.fillText(label.toUpperCase(), col1X + 70, y);
-    ctx.fillStyle = "#111827"; ctx.font = "bold 15px Arial";
-    ctx.fillText(String(value).substring(0, 22), col1X + 70, y + 18);
-    y += 42;
-  });
-
-  y = 285;
-  rows2.forEach(([label, value]) => {
-    ctx.fillStyle = "#9CA3AF"; ctx.font = "11px Arial";
-    ctx.fillText(label.toUpperCase(), col2X, y);
-    ctx.fillStyle = label === "Statut" ? "#059669" : "#111827";
-    ctx.font = "bold 15px Arial";
-    ctx.fillText(String(value).substring(0, 22), col2X, y + 18);
-    y += 42;
+  let y = 268;
+  [[...col1, ...col2], col3].forEach((rows, colIdx) => {
+    const x = colIdx === 0 ? px + 72 : 360;
+    let ry = y;
+    rows.forEach(([label, value]) => {
+      ctx.fillStyle = "#9CA3AF"; ctx.font = "10px Arial"; ctx.textAlign = "left";
+      ctx.fillText(String(label).toUpperCase(), x, ry);
+      ctx.fillStyle = label === "Statut" ? "#059669" : "#111827";
+      ctx.font = "bold 14px Arial";
+      ctx.fillText(String(value ?? "—").substring(0, 24), x, ry + 17);
+      ry += 40;
+    });
   });
 
   // Bénéficiaires famille
-  if (isFamille && assure.beneficiaires?.length > 0) {
-    ctx.fillStyle = "#9CA3AF"; ctx.font = "11px Arial"; ctx.textAlign = "left";
-    ctx.fillText("BÉNÉFICIAIRES", col1X + 70, 475);
-    const bens = assure.beneficiaires.slice(0, 5).join("  ·  ");
-    ctx.fillStyle = BRAND; ctx.font = "bold 13px Arial";
-    ctx.fillText(bens.substring(0, 50), col1X + 70, 492);
+  if (bens.length > 0) {
+    ctx.fillStyle = "#9CA3AF"; ctx.font = "10px Arial";
+    ctx.fillText("BÉNÉFICIAIRES", px + 72, 460);
+    ctx.fillStyle = BRAND; ctx.font = "bold 12px Arial";
+    ctx.fillText(bens.slice(0, 5).join("  ·  ").substring(0, 55), px + 72, 478);
   }
 
-  // QR code
+  // QR
   const qr = await loadImg(qrUrl(assure.numero ?? "PSA"));
   if (qr) {
-    ctx.fillStyle = "white";
-    ctx.beginPath(); ctx.roundRect(photoX, photoY + photoH + 14, photoW, photoW, 8); ctx.fill();
-    ctx.drawImage(qr, photoX + 4, photoY + photoH + 18, photoW - 8, photoW - 8);
+    const qrX = photoX, qrY = photoY + photoH + 10, qrS = photoW;
+    ctx.fillStyle = "white"; roundRect(qrX, qrY, qrS, qrS, 6); ctx.fill();
+    ctx.strokeStyle = "#E5E7EB"; ctx.lineWidth = 1; roundRect(qrX, qrY, qrS, qrS, 6); ctx.stroke();
+    ctx.drawImage(qr, qrX + 4, qrY + 4, qrS - 8, qrS - 8);
   }
 
-  // Bas de carte
-  ctx.fillStyle = `${BRAND}0D`;
-  ctx.fillRect(0, H - 42, W, 42);
-  ctx.strokeStyle = `${BRAND}22`; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(0, H - 42); ctx.lineTo(W, H - 42); ctx.stroke();
-
-  ctx.fillStyle = "#9CA3AF"; ctx.font = "11px Arial"; ctx.textAlign = "left";
-  ctx.fillText(`Délivrée le ${new Date().toLocaleDateString("fr-FR")}`, 28, H - 16);
-  ctx.textAlign = "center";
-  ctx.fillStyle = BRAND; ctx.font = "bold 11px Arial";
-  ctx.fillText("www.papyservicesassurances.sn", W / 2, H - 16);
-  ctx.textAlign = "right";
-  ctx.fillStyle = "#9CA3AF"; ctx.font = "italic 11px Arial";
-  ctx.fillText("Le Directeur Général", W - 28, H - 16);
+  // Pied de carte
+  ctx.fillStyle = "#1B52990D"; ctx.fillRect(0, H - 40, W, 40);
+  ctx.strokeStyle = "#1B529922"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H - 40); ctx.lineTo(W, H - 40); ctx.stroke();
+  ctx.fillStyle = "#9CA3AF"; ctx.font = "10px Arial"; ctx.textAlign = "left";
+  ctx.fillText(`Délivrée le ${new Date().toLocaleDateString("fr-FR")}`, 28, H - 13);
+  ctx.fillStyle = BRAND; ctx.font = "bold 10px Arial"; ctx.textAlign = "center";
+  ctx.fillText("www.papyservicesassurances.sn", W / 2, H - 13);
+  ctx.fillStyle = "#9CA3AF"; ctx.font = "italic 10px Arial"; ctx.textAlign = "right";
+  ctx.fillText("Le Directeur Général", W - 28, H - 13);
 
   // Clip arrondi final
   ctx.globalCompositeOperation = "destination-in";
-  ctx.beginPath(); ctx.roundRect(0, 0, W, H, 28); ctx.fill();
-  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "black"; roundRect(0, 0, W, H, 28); ctx.fill();
 
   canvas.toBlob(blob => {
     if (!blob) return;
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url;
-    a.download = `carte-psa-${assure.numero ?? "assurance"}.png`;
-    a.click();
+    a.href = url; a.download = `carte-psa-${assure.numero ?? "assurance"}.png`; a.click();
     URL.revokeObjectURL(url);
   }, "image/png");
 }
@@ -415,10 +359,10 @@ export default function CartesPage() {
   const { user } = useAuth();
   const isClient = user?.role === "client";
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch]   = useState("");
   const [assures, setAssures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError]     = useState(false);
 
   useEffect(() => {
     DataService.getAssures()
@@ -431,7 +375,7 @@ export default function CartesPage() {
   }, [isClient, user?.email]);
 
   const filtered = assures.filter(a =>
-    (a.nom ?? "").toLowerCase().includes(search.toLowerCase()) ||
+    (a.nom    ?? "").toLowerCase().includes(search.toLowerCase()) ||
     (a.prenom ?? "").toLowerCase().includes(search.toLowerCase()) ||
     (a.numero ?? "").toLowerCase().includes(search.toLowerCase())
   );
@@ -441,7 +385,7 @@ export default function CartesPage() {
   if (loading) return (
     <AppLayout title={pageTitle}>
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-brand" />
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "#1B5299" }} />
         <span className="ml-3 text-sm text-muted-foreground">Chargement des cartes…</span>
       </div>
     </AppLayout>
@@ -461,7 +405,6 @@ export default function CartesPage() {
     <AppLayout title={pageTitle}>
       <div className="space-y-5">
 
-        {/* ── Barre de recherche ─────────────────────────────────────── */}
         {!isClient && (
           <div className="flex items-center gap-2 w-full max-w-sm">
             <div className="flex items-center gap-2 flex-1 px-3 py-2 rounded-lg border border-input bg-card text-sm">
@@ -476,59 +419,48 @@ export default function CartesPage() {
           </div>
         )}
 
-        {/* ── Vide ───────────────────────────────────────────────────── */}
         {filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center h-48 gap-3 text-center">
-            <CreditCard size={40} className="text-muted-foreground opacity-30" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+              className="w-10 h-10 text-muted-foreground opacity-30">
+              <rect x="2" y="5" width="20" height="14" rx="2"/>
+              <path d="M2 10h20"/>
+            </svg>
             <p className="font-semibold">
-              {search ? "Aucun assuré trouvé" : isClient ? "Aucune carte pour votre compte" : "Aucun assuré enregistré"}
+              {search ? "Aucun assuré trouvé"
+                : isClient ? "Aucune carte pour votre compte"
+                : "Aucun assuré enregistré"}
             </p>
-            {!search && isClient && (
-              <p className="text-sm text-muted-foreground max-w-xs">
-                Contactez l'administrateur si votre dossier est introuvable.
-              </p>
-            )}
           </div>
         )}
 
-        {/* ── Grille de cartes ───────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {filtered.map((assure, i) => (
             <motion.div
-              key={assure.id}
+              key={assure.id ?? i}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.07 }}
               className="space-y-3"
             >
-              {/* Carte visuelle */}
               <InsuranceCard assure={assure} />
 
-              {/* Actions */}
               <div className="flex items-center gap-2 px-1">
-                {/* Info bénéficiaires */}
-                {(assure.beneficiaires?.length > 0) && (
+                {Array.isArray(assure.beneficiaires) && assure.beneficiaires.length > 0 && (
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Users size={13} />
-                    <span>{assure.beneficiaires.length} bénéficiaire{assure.beneficiaires.length > 1 ? "s" : ""}</span>
+                    <span>
+                      {assure.beneficiaires.length} bénéficiaire
+                      {assure.beneficiaires.length > 1 ? "s" : ""}
+                    </span>
                   </div>
                 )}
                 <div className="flex gap-2 ml-auto">
-                  <Button
-                    size="sm"
-                    onClick={() => downloadCard(assure)}
-                    className="h-8 text-xs gap-1.5"
-                  >
-                    <Download size={13} />
-                    Télécharger
+                  <Button size="sm" onClick={() => downloadCard(assure)} className="h-8 text-xs gap-1.5">
+                    <Download size={13} /> Télécharger
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    title="Voir QR code"
-                    onClick={() => window.open(qrUrl(assure.numero ?? "PSA"), "_blank")}
-                  >
+                  <Button variant="outline" size="sm" className="h-8 w-8 p-0"
+                    onClick={() => window.open(qrUrl(assure.numero ?? "PSA"), "_blank")}>
                     <QrCode size={13} />
                   </Button>
                 </div>
