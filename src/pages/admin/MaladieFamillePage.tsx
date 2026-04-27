@@ -40,8 +40,17 @@ function isExpiringSoon(famille: any): boolean {
 }
 
 function getBeneficiairesDetail(famille: any): Beneficiaire[] {
-  if (famille.beneficiairesDetail) return famille.beneficiairesDetail;
-  return (famille.beneficiaires || []).map((b: string) => ({
+  const raw = famille.beneficiairesDetail;
+  if (Array.isArray(raw)) return raw;
+  if (raw && typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {}
+  }
+  const list = famille.beneficiaires;
+  if (!Array.isArray(list)) return [];
+  return list.map((b: string) => ({
     nom:  b.replace(/ \(.+\)$/, ""),
     lien: (b.match(/\((.+)\)$/) || [])[1] || "",
     type: "adulte" as TypeAssure,
@@ -78,7 +87,7 @@ export default function MaladieFamillePage() {
   };
 
   const filtered = familles.filter(f =>
-    f.principal.toLowerCase().includes(search.toLowerCase())
+    (f.principal || "").toLowerCase().includes(search.toLowerCase())
   );
 
   // Stats globales
