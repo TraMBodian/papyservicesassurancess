@@ -157,10 +157,10 @@ function DashboardHeader({ user, onRefresh, liveFlash }: { user: any; onRefresh:
 
 function QuickActions({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   const actions = [
-    { label: 'Ajouter assuré',    icon: <UserPlus size={15} />,  color: 'bg-blue-600 hover:bg-blue-700',    route: '/admin/new-assure' },
-    { label: 'Créer contrat',     icon: <FileText size={15} />,    color: 'bg-purple-600 hover:bg-purple-700', route: '/admin/new-police' },
-    { label: 'Déclarer sinistre', icon: <AlertCircle size={15} />, color: 'bg-orange-500 hover:bg-orange-600', route: '/sinistres' },
-    { label: 'Nouveau prestataire', icon: <Plus size={15} />,    color: 'bg-teal-600 hover:bg-teal-700',    route: '/admin/new-prestataire' },
+    { label: 'Ajouter assuré',      icon: <UserPlus size={15} />,    color: 'bg-blue-600 hover:bg-blue-700',     route: '/admin/assures/new' },
+    { label: 'Créer contrat',       icon: <FileText size={15} />,    color: 'bg-purple-600 hover:bg-purple-700', route: '/admin/polices/new' },
+    { label: 'Déclarer sinistre',   icon: <AlertCircle size={15} />, color: 'bg-orange-500 hover:bg-orange-600', route: '/sinistres' },
+    { label: 'Nouveau prestataire', icon: <Plus size={15} />,        color: 'bg-teal-600 hover:bg-teal-700',     route: '/admin/prestataires/new' },
   ];
 
   return (
