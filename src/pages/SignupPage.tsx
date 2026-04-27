@@ -91,22 +91,40 @@ const SignupPage = () => {
 
   return (
     <div className="h-screen flex overflow-hidden">
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .card-animate { animation: fadeInUp 0.6s ease both; }
+        .btn-gradient {
+          background: linear-gradient(135deg, #2a5298, #1e3c72);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .btn-gradient:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+        }
+      `}</style>
 
-      {/* ── Panneau gauche : branding blanc ─────────────────────── */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center p-12 overflow-hidden bg-white border-r border-gray-100 shrink-0">
+      {/* ── Panneau gauche ───────────────────────────────────────── */}
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col items-center justify-center p-16 overflow-hidden shrink-0"
+        style={{ background: '#f8fafc' }}>
         <div className="relative z-10 flex flex-col items-center text-center">
-          <img src="/logo1.png" alt="Logo" className="w-56 h-56 object-contain mb-6 drop-shadow-sm" />
-          <h1 className="text-3xl font-extrabold tracking-tight mb-3 text-brand">Papy Services Assurances</h1>
+          <img src="/logo1.png" alt="Logo" className="w-36 h-36 object-contain mb-6 drop-shadow-sm" />
+          <h1 className="text-3xl font-extrabold tracking-tight mb-3 text-[#1e3c72]">Papy Services Assurances</h1>
           <p className="text-gray-500 text-base max-w-xs leading-relaxed">
             La plateforme de gestion d'assurance santé nouvelle génération
           </p>
           <div className="mt-10 flex flex-col gap-3 w-full max-w-xs">
             {[
-              { icon: <ShieldCheck size={18} className="text-brand shrink-0" />, text: "Données sécurisées & chiffrées" },
-              { icon: <Zap size={18} className="text-brand shrink-0" />, text: "Accès instantané à vos polices" },
-              { icon: <Building2 size={18} className="text-brand shrink-0" />, text: "Réseau de prestataires certifiés" },
+              { icon: <ShieldCheck size={18} className="text-[#2a5298] shrink-0" />, text: "Données sécurisées & chiffrées" },
+              { icon: <Zap size={18} className="text-[#2a5298] shrink-0" />, text: "Accès instantané à vos polices" },
+              { icon: <Building2 size={18} className="text-[#2a5298] shrink-0" />, text: "Réseau de prestataires certifiés" },
             ].map((item) => (
-              <div key={item.text} className="flex items-center gap-3 bg-brand/5 border border-brand/10 rounded-xl px-4 py-3 text-sm text-gray-700">
+              <div key={item.text}
+                className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-700"
+                style={{ background: 'rgba(42,82,152,0.06)', border: '1px solid rgba(42,82,152,0.12)' }}>
                 {item.icon}
                 <span>{item.text}</span>
               </div>
@@ -115,8 +133,11 @@ const SignupPage = () => {
         </div>
       </div>
 
-      {/* ── Panneau droit : bleu du logo ────────────────────────── */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center bg-brand relative overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* ── Panneau droit : dégradé premium ─────────────────────── */}
+      <div
+        className="w-full lg:w-1/2 flex flex-col items-center relative overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        style={{ background: 'linear-gradient(135deg, #1e3c72, #2a5298)' }}
+      >
 
         {/* Cercles décoratifs */}
         <div className="absolute -top-24 -right-24 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
@@ -129,7 +150,10 @@ const SignupPage = () => {
         </div>
 
         {/* Carte formulaire */}
-        <div className="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-2xl p-7 sm:p-10 border border-white/20 my-8 mx-6">
+        <div
+          className="card-animate relative z-10 w-full max-w-md bg-white rounded-2xl p-7 sm:p-10 my-8 mx-6"
+          style={{ boxShadow: '0 20px 40px rgba(0,0,0,0.18)', border: '1px solid rgba(255,255,255,0.15)' }}
+        >
 
           <div className="mb-7">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Créer un compte</h2>
@@ -259,7 +283,8 @@ const SignupPage = () => {
               </label>
             </div>
 
-            <Button type="submit" className="w-full h-11 rounded-xl text-sm font-semibold"
+            <button type="submit"
+              className="btn-gradient w-full h-11 rounded-xl text-sm font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={loading || !cgAccepted}>
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -270,7 +295,7 @@ const SignupPage = () => {
                   Création en cours...
                 </span>
               ) : "Créer mon compte"}
-            </Button>
+            </button>
           </form>
 
           <div className="mt-6 flex flex-col items-center gap-2">
